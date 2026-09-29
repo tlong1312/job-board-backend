@@ -1,0 +1,35 @@
+name: Backend CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Kéo source code từ GitHub về máy chủ ảo
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # Cài đặt môi trường Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Chạy bản Node.js ổn định nhất cho NestJS 11
+          cache: "npm" # Lưu cache để các lần chạy sau cài thư viện nhanh hơn
+
+      # Cài đặt các gói thư viện
+      - name: Install Dependencies
+        run: npm ci
+
+      # Quét lỗi code bằng ESLint
+      - name: Run Linter
+        run: npm run lint
+
+      # Build thử dự án xem có bị lỗi TypeScript không
+      - name: Build Project
+        run: npm run build
