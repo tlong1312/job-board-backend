@@ -1,19 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { CreateJobDto } from './dto/create-job.dto';
-import { UpdateJobDto } from './dto/update-job.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateJobDto } from "./dto/create-job.dto";
+import { UpdateJobDto } from "./dto/update-job.dto";
+import { Job } from "./entities/job.entity";
+import { NotFoundException } from "commons/error";
 
 @Injectable()
 export class JobsService {
-  create(createJobDto: CreateJobDto) {
-    return 'This action adds a new job';
+  private readonly jobs: Job[] = [];
+  private nextId = 1;
+
+  create(createJobDto: CreateJobDto): Job {
+    const job: Job = { id: this.nextId++, ...createJobDto };
+    this.jobs.push(job);
+    return job;
   }
 
-  findAll() {
-    return `This action returns all jobs`;
+  findAll(): Job[] {
+    return this.jobs;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} job`;
+  findOne(id: number): Job {
+    const job = this.jobs.find((j) => j.id === id);
+    if (!job) {
+      throw new NotFoundException(`Không tìm thấy việc làm có id ${id}`);
+    }
+    return job;
   }
 
   update(id: number, updateJobDto: UpdateJobDto) {

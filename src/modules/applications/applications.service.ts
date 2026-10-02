@@ -1,11 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { CreateApplicationDto } from './dto/create-application.dto';
-import { UpdateApplicationDto } from './dto/update-application.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateApplicationDto } from "./dto/create-application.dto";
+import { UpdateApplicationDto } from "./dto/update-application.dto";
+import { Application } from "./entities/application.entity";
+import { JobsService } from "../jobs/jobs.service";
 
 @Injectable()
 export class ApplicationsService {
+  private readonly applications: Application[] = [];
+  private nextId = 1;
+
+  constructor(private readonly jobsService: JobsService) {}
+
   create(createApplicationDto: CreateApplicationDto) {
-    return 'This action adds a new application';
+    const job = this.jobsService.findOne(createApplicationDto.jobId);
+    const application: Application = {
+      id: this.nextId++,
+      jobId: job.id,
+      candidateName: createApplicationDto.candidateName,
+      status: "new",
+    };
+    this.applications.push(application);
+    return application;
   }
 
   findAll() {
