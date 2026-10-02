@@ -3,38 +3,38 @@ version: "3.8"
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: ai_study_postgres
+    container_name: job_board_postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: ai_study_db
+      POSTGRES_DB: job_board_db
     ports:
       - "5435:5432"
     volumes:
-      - ai_study_pgdata:/var/lib/postgresql/data
+      - job_board_pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: ai_study_rabbitmq
+    container_name: job_board_rabbitmq
     restart: always
     ports:
       - "5673:5672"
       - "15673:15672"
     volumes:
-      - ai_study_rabbitmq_data:/var/lib/rabbitmq
+      - job_board_rabbitmq_data:/var/lib/rabbitmq
 
   redis:
     image: redis:7-alpine
-    container_name: ai_study_redis
+    container_name: job_board_redis
     restart: always
     ports:
       - "6381:6379"
     volumes:
-      - ai_study_redis_data:/data
+      - job_board_redis_data:/data
 
 volumes:
-  ai_study_pgdata:
-  ai_study_rabbitmq_data:
-  ai_study_redis_data:
+  job_board_pgdata:
+  job_board_rabbitmq_data:
+  job_board_redis_data:

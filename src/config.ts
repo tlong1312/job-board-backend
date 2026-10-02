@@ -11,7 +11,7 @@ export const load = () => {
     port: parseInt(env.DB_PORT || "5435", 10),
     username: env.DB_USER || "postgres",
     password: String(env.DB_PASS || "123456"),
-    database: env.DB_NAME || "ai_study_db",
+    database: env.DB_NAME || "job_board_db",
   };
   return {
     db: {
