@@ -16,6 +16,8 @@ export const SOMETHING_WRONG = "SOMETHING WRONG";
 
 export const TOKEN_EXPIRED = "TOKEN EXPIRED";
 
+export const CONFLICT = "CONFLICT";
+
 export class ServiceError extends Error {
   name!: string;
   status!: number;
@@ -99,5 +101,13 @@ export class InternalServerException extends ServiceError {
     super(error);
     this.status = HttpStatus.INTERNAL_SERVER_ERROR;
     this.message = INTERNAL_SERVER_ERROR;
+  }
+}
+
+export class ConflictException extends BadRequestException {
+  constructor(error: any) {
+    super(error);
+    this.message = CONFLICT;
+    this.status = HttpStatus.CONFLICT;
   }
 }
