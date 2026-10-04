@@ -17,11 +17,11 @@ export const load = () => {
     db: {
       ...dbConfig,
       type: "postgres",
-      synchronize: true,
+      synchronize: false,
       logging: true,
       keepConnectionAlive: true,
       migrationsTableName: "migration_typeorm",
-      migrationsRun: true,
+      migrationsRun: false,
       autoLoadEntities: true,
       migrations: [join(__dirname, "./migrations/*{.ts,.js}")],
     } as TypeOrmModuleOptions,
