@@ -1,10 +1,14 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
-import { NotFoundException } from "commons/error";
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from "commons/error";
 import * as bcrypt from "bcrypt";
 
 @Injectable()
@@ -16,9 +20,10 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const { password, email, ...restData } = createUserDto;
+    const normalizedEmail = email.trim().toLowerCase();
 
     const existingUser = await this.usersRepository.findOne({
-      where: { email },
+      where: { email: normalizedEmail },
     });
     if (existingUser) {
       throw new ConflictException("Email này đã được sử dụng");
@@ -29,7 +34,7 @@ export class UsersService {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     const newUser = this.usersRepository.create({
-      email,
+      email: normalizedEmail,
       passwordHash,
       ...restData,
     });
@@ -52,7 +57,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.findOne(id); 
+    const user = await this.findOne(id);
 
     if (updateUserDto.fullName) {
       user.fullName = updateUserDto.fullName;
@@ -67,7 +72,7 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    const user = await this.findOne(id); 
+    const user = await this.findOne(id);
 
     // Chặn vô hiệu hoá 2 lần
     if (user.isActive === false) {
