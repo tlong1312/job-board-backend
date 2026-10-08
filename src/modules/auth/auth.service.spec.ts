@@ -58,43 +58,52 @@ describe("AuthService", () => {
     jest.clearAllMocks();
   });
 
-  // describe("register", () => {
-  //   it("nên đăng ký thành công và trả về cặp token", async () => {
-  //     mockUsersService.create.mockResolvedValue(mockUser);
-  //     mockJwtService.signAsync
-  //       .mockResolvedValueOnce("access_token_123")
-  //       .mockResolvedValueOnce("refresh_token_123");
-  //     mockRefreshRepository.save.mockResolvedValue({});
+  describe("register", () => {
+    it("nên đăng ký thành công và trả về cặp token", async () => {
+      mockUsersService.create.mockResolvedValue(mockUser);
+      mockJwtService.signAsync
+        .mockResolvedValueOnce("access_token_123")
+        .mockResolvedValueOnce("refresh_token_123");
+      mockRefreshRepository.save.mockResolvedValue({});
 
-  //     const result = await service.register({
-  //       email: "candidate@jobboard.local",
-  //       password: "Password@123",
-  //       fullName: "Nguyễn Văn A",
-  //     } as any);
+      const result = await service.register({
+        email: "candidate@jobboard.local",
+        password: "Password@123",
+        fullName: "Nguyễn Văn A",
+      });
 
-  //     expect(result).toEqual({
-  //       accessToken: "access_token_123",
-  //       refreshToken: "refresh_token_123",
-  //       user: {
-  //         id: 1,
-  //         email: "candidate@jobboard.local",
-  //         fullName: "Nguyễn Văn A",
-  //         role: "candidate",
-  //       },
-  //     });
-  //     expect(mockRefreshRepository.save).toHaveBeenCalledTimes(1);
-  //   });
+      expect(result).toEqual({
+        accessToken: "access_token_123",
+        refreshToken: "refresh_token_123",
+        user: {
+          id: 1,
+          email: "candidate@jobboard.local",
+          fullName: "Nguyễn Văn A",
+          role: "candidate",
+        },
+      });
+      expect(mockUsersService.create).toHaveBeenCalledWith({
+        email: "candidate@jobboard.local",
+        password: "Password@123",
+        fullName: "Nguyễn Văn A",
+      });
+      expect(mockRefreshRepository.save).toHaveBeenCalledTimes(1);
+    });
 
-  //   it("nên ném ConflictException (409) khi email đã được đăng ký", async () => {
-  //     mockUsersService.create.mockRejectedValue(
-  //       new ConflictException("Email đã được đăng ký"),
-  //     );
+    it("nên ném ConflictException (409) khi email đã được đăng ký", async () => {
+      mockUsersService.create.mockRejectedValue(
+        new ConflictException("Email đã được đăng ký"),
+      );
 
-  //     await expect(
-  //       service.register({ email: "candidate@jobboard.local" } as any),
-  //     ).rejects.toThrow(ConflictException);
-  //   });
-  // });
+      await expect(
+        service.register({
+          email: "candidate@jobboard.local",
+          password: "Password@123",
+          fullName: "Nguyễn Văn A",
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
 
   describe("login", () => {
     it("nên cấp cặp token và lưu bản băm refresh token vào DB", async () => {

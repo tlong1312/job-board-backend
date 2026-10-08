@@ -22,10 +22,10 @@ export class AuthService {
     private readonly refreshRepository: Repository<RefreshToken>,
   ) {}
 
-  // async register(dto: RegisterDto) {
-  //   const user = await this.userService.create(dto);
-  //   return this.issueTokens(user);
-  // }
+  async register(dto: RegisterDto) {
+    const user = await this.userService.create(dto);
+    return this.issueTokens(user);
+  }
 
   login(user: User) {
     return this.issueTokens(user);
@@ -41,7 +41,7 @@ export class AuthService {
     return crypto.createHash("sha256").update(value).digest("hex");
   }
 
-  private signAccessToken(user: User) {
+  private signAccessToken(user: Omit<User, "passwordHash">) {
     return this.jwtService.signAsync(
       { sub: user.id, email: user.email, role: user.role },
       { secret: this.secret("JWT_ACCESS_SECRET"), expiresIn: ACCESS_TTL },
@@ -82,7 +82,7 @@ export class AuthService {
     return { message: "Đăng xuất thành công" };
   }
 
-  private async issueTokens(user: User) {
+  private async issueTokens(user: Omit<User, "passwordHash">) {
     const accessToken = await this.signAccessToken(user);
     const refreshToken = await this.jwtService.signAsync(
       { sub: user.id, jti: crypto.randomUUID() },

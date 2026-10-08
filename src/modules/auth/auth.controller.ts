@@ -1,11 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -23,14 +19,17 @@ import { RefreshTokenDto } from "./dto/refresh-token.dto";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @Post('register')
-  // @ApiOperation({ summary: 'Đăng ký tài khoản' })
-  // @ApiResponse({ status: 201, description: 'Đăng ký thành công, trả về hai token' })
-  // @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
-  // @ApiResponse({ status: 409, description: 'Email đã được đăng ký' })
-  // register(@Body() dto: RegisterDto) {
-  //   return this.authService.register(dto);
-  // }
+  @Post("register")
+  @ApiOperation({ summary: "Đăng ký tài khoản" })
+  @ApiResponse({
+    status: 201,
+    description: "Đăng ký thành công, trả về hai token",
+  })
+  @ApiResponse({ status: 400, description: "Dữ liệu không hợp lệ" })
+  @ApiResponse({ status: 409, description: "Email đã được đăng ký" })
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
 
   @Post("login")
   @HttpCode(HttpStatus.OK)
