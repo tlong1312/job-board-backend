@@ -13,16 +13,24 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import {
   ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from "@nestjs/swagger";
 
+@ApiTags("Users")
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @ApiOperation({ summary: "Tạo tài khoản người dùng mới" })
+  @ApiCreatedResponse({ description: "Người dùng được tạo thành công." })
+  @ApiBadRequestResponse({ description: "Dữ liệu đầu vào không hợp lệ." })
+  @ApiConflictResponse({ description: "Email này đã được sử dụng." })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -44,12 +52,23 @@ export class UsersController {
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiOperation({ summary: "Cập nhật thông tin (fullName, phone)" })
+  @ApiOkResponse({ description: "Cập nhật thành công" })
+  @ApiBadRequestResponse({ description: "Dữ liệu hoặc id không hợp lệ" })
+  @ApiNotFoundResponse({ description: "Không tìm thấy người dùng" })
+  update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto
+  ) {
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.usersService.remove(+id);
+  @ApiOperation({ summary: "Vô hiệu hóa người dùng (Soft Delete)" })
+  @ApiOkResponse({ description: "Vô hiệu hóa thành công" })
+  @ApiBadRequestResponse({ description: "Tài khoản đã bị vô hiệu hoá trước đó" })
+  @ApiNotFoundResponse({ description: "Không tìm thấy người dùng" })
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.usersService.remove(id);
   }
 }
