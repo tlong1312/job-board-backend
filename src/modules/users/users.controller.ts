@@ -71,4 +71,10 @@ export class UsersController {
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }
+
+  @Delete(":id/delete")
+  @ApiOperation({ summary: 'Xóa vĩnh viễn người dùng theo ID' })
+  hardRemove(@Param('id') id: string) {
+    return this.usersService.hardRemove(+id);
+  }
 }
