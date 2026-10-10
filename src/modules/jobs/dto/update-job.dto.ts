@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateJobDto } from './create-job.dto';
+import { OmitType, PartialType } from "@nestjs/swagger";
+import { CreateJobDto } from "./create-job.dto";
 
-export class UpdateJobDto extends PartialType(CreateJobDto) {}
+// Không cho đổi công ty và người đăng sau khi tạo tin
+export class UpdateJobDto extends PartialType(
+  OmitType(CreateJobDto, ["companyId", "createdBy"] as const),
+) {}

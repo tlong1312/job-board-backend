@@ -26,48 +26,42 @@ export class ApplicationsService {
   ) {}
 
   async create(createApplicationDto: CreateApplicationDto) {
-    const candidate =
-    await this.usersService.findOne(createApplicationDto.candidateId);
+    const job = await this.jobsService.findOne(createApplicationDto.jobId);
 
+    const candidate = await this.usersService.findOne(createApplicationDto.candidateId);
     if (candidate.role !== "candidate") {
-      throw new BadRequestException(
-        "Chỉ ứng viên mới được nộp hồ sơ",
-      );
+      throw new BadRequestException("Chỉ ứng viên mới được nộp hồ sơ");
     }
 
-    const existingApplication =
-      await this.applicationsRepository.findOne({
-        where: {
-          jobId: createApplicationDto.jobId,
-          candidateId: createApplicationDto.candidateId,
-        },
-      });
-
-    if (existingApplication) {
-      throw new ConflictException(
-        "Ứng viên đã nộp hồ sơ cho tin này",
-      );
-    }
-
-    const application =
-      this.applicationsRepository.create({
+    const existingApplication = await this.applicationsRepository.findOne({
+      where: {
         jobId: createApplicationDto.jobId,
         candidateId: createApplicationDto.candidateId,
-        resumeId: createApplicationDto.resumeId ?? null,
-        coverLetter: createApplicationDto.coverLetter ?? null,
-        status: "new",
-      });
-      
-    return this.applicationsRepository.save(application);
+      },
+    });
+
+    if (existingApplication) {
+      throw new ConflictException("Ứng viên đã nộp hồ sơ cho tin này");
     }
 
-    async findAll(
-      jobId?: number,
-      candidateId?: number,
-    ): Promise<ApplicationEntity[]> {
-      const where: {
-        jobId?: number;
-        candidateId?: number;
+    const application = this.applicationsRepository.create({
+      jobId: createApplicationDto.jobId,
+      candidateId: createApplicationDto.candidateId,
+      resumeId: createApplicationDto.resumeId ?? null,
+      coverLetter: createApplicationDto.coverLetter ?? null,
+      status: "new",
+    });
+      
+    return this.applicationsRepository.save(application);
+  }
+
+  async findAll(
+    jobId?: number,
+    candidateId?: number,
+  ): Promise<ApplicationEntity[]> {
+    const where: {
+      jobId?: number;
+      candidateId?: number;
     } = {};
 
     if (jobId) {
