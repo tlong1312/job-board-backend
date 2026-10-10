@@ -11,8 +11,8 @@ export class ApplicationsService {
 
   constructor(private readonly jobsService: JobsService) {}
 
-  create(createApplicationDto: CreateApplicationDto) {
-    const job = this.jobsService.findOne(createApplicationDto.jobId);
+  async create(createApplicationDto: CreateApplicationDto) {
+    const job = await this.jobsService.findOne(createApplicationDto.jobId);
     const application: Application = {
       id: this.nextId++,
       jobId: job.id,
