@@ -13,6 +13,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -20,7 +21,9 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { Public } from "commons/decorators/public.decorator";
 
+@ApiBearerAuth()
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
@@ -35,7 +38,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
+  @Public()
   @ApiOperation({ summary: "Lấy danh sách người dùng" })
   @ApiOkResponse({ description: "Mảng người dùng" })
   findAll() {
@@ -58,17 +61,25 @@ export class UsersController {
   @ApiNotFoundResponse({ description: "Không tìm thấy người dùng" })
   update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete(":id")
-  @ApiOperation({ summary: "Vô hiệu hóa người dùng (Soft Delete)" })
+  @Patch("/lock/:id")
+  @ApiOperation({ summary: "Khóa người dùng theo ID" })
   @ApiOkResponse({ description: "Vô hiệu hóa thành công" })
-  @ApiBadRequestResponse({ description: "Tài khoản đã bị vô hiệu hoá trước đó" })
+  @ApiBadRequestResponse({
+    description: "Tài khoản đã bị vô hiệu hoá trước đó",
+  })
   @ApiNotFoundResponse({ description: "Không tìm thấy người dùng" })
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.remove(id);
+  }
+
+  @Delete(":id")
+  @ApiOperation({ summary: "Xóa vĩnh viễn người dùng theo ID" })
+  hardRemove(@Param("id") id: string) {
+    return this.usersService.hardRemove(+id);
   }
 }

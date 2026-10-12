@@ -84,4 +84,13 @@ export class UsersService {
     const { passwordHash: _, ...result } = deletedUser;
     return result;
   }
+
+  async hardRemove(id: number) {
+    await this.findOne(id);
+    await this.usersRepository.delete(id);
+    return {
+      statusCode: 200,
+      message: `Đã xóa vĩnh viễn người dùng có ID là ${id}`,
+    };
+  }
 }

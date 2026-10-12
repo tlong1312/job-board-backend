@@ -13,11 +13,12 @@ import { RegisterDto } from "./dto/register.dto";
 import { LocalAuthGuard } from "commons/guards/local-auth.guard";
 import { LoginDto } from "./dto/login.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { Public } from "commons/decorators/public.decorator";
 
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post("register")
   @ApiOperation({ summary: "Đăng ký tài khoản" })
@@ -32,6 +33,7 @@ export class AuthController {
   }
 
   @Post("login")
+  @Public()
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
