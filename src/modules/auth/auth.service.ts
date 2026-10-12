@@ -8,6 +8,7 @@ import { User } from "../users/entities/user.entity";
 import { ForBiddenException, UnAuthorizedException } from "commons/error";
 import * as crypto from "crypto";
 import { RegisterDto } from "./dto/register.dto";
+import { Role } from "commons/decorators/roles.decorator";
 
 const ACCESS_TTL = "15m";
 const REFRESH_TTL = "7d";
@@ -103,5 +104,12 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+  verifyAccessToken(token: string) {
+    return this.jwtService.verifyAsync<{
+      sub: number;
+      email: string;
+      role: Role;
+    }>(token, { secret: this.secret("JWT_ACCESS_SECRET") });
   }
 }
