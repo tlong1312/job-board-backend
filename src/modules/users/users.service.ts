@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, ForbiddenException } from "@nestjs/common"; // <-- Import thêm ForbiddenException
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -29,7 +29,6 @@ export class UsersService {
       throw new ConflictException("Email này đã được sử dụng");
     }
 
-    //Hash mật khẩu
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
@@ -56,7 +55,11 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, currentUser: any) {
+    if (currentUser.role !== 'admin' && currentUser.id !== id) {
+      throw new ForbiddenException("Bạn không có quyền chỉnh sửa thông tin của người khác.");
+    }
+
     const user = await this.findOne(id);
 
     if (updateUserDto.fullName) {
@@ -71,10 +74,13 @@ export class UsersService {
     return result;
   }
 
-  async remove(id: number) {
+  async remove(id: number, currentUser: any) {
+    if (currentUser.role !== 'admin' && currentUser.id !== id) {
+      throw new ForbiddenException("Bạn không có quyền khóa tài khoản của người khác.");
+    }
+
     const user = await this.findOne(id);
 
-    // Chặn vô hiệu hoá 2 lần
     if (user.isActive === false) {
       throw new BadRequestException("Tài khoản đã bị vô hiệu hoá trước đó");
     }
