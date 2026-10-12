@@ -25,35 +25,74 @@ export class ApplicationsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createApplicationDto: CreateApplicationDto) {
-    const job = await this.jobsService.findOne(createApplicationDto.jobId);
+async create(createApplicationDto: CreateApplicationDto) {
+  const job = await this.jobsService.findOne(
+    createApplicationDto.jobId,
+  );
 
-    const candidate = await this.usersService.findOne(createApplicationDto.candidateId);
-    if (candidate.role !== "candidate") {
-      throw new BadRequestException("Chỉ ứng viên mới được nộp hồ sơ");
+  // 2. Chỉ job đang open mới được nhận hồ sơ
+  if (job.status !== "open") {
+    throw new BadRequestException(
+      "Tin tuyển dụng đã đóng hoặc bị khoá, không nhận hồ sơ",
+    );
+  }
+  if (job.deadline) {
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(
+      today.getMonth() + 1,
+    ).padStart(2, "0");
+    const day = String(
+      today.getDate(),
+    ).padStart(2, "0");
+
+    const todayString = `${year}-${month}-${day}`;
+
+    if (job.deadline < todayString) {
+      throw new BadRequestException(
+        "Tin đã hết hạn nộp hồ sơ",
+      );
     }
-
-    const existingApplication = await this.applicationsRepository.findOne({
+  }
+  const candidate = await this.usersService.findOne(
+    createApplicationDto.candidateId,
+  );
+  if (candidate.role !== "candidate") {
+    throw new BadRequestException(
+      "Chỉ ứng viên mới được nộp hồ sơ",
+    );
+  }
+  const existingApplication =
+    await this.applicationsRepository.findOne({
       where: {
         jobId: createApplicationDto.jobId,
-        candidateId: createApplicationDto.candidateId,
+        candidateId:
+          createApplicationDto.candidateId,
       },
     });
 
-    if (existingApplication) {
-      throw new ConflictException("Ứng viên đã nộp hồ sơ cho tin này");
-    }
-
-    const application = this.applicationsRepository.create({
+  if (existingApplication) {
+    throw new ConflictException(
+      "Ứng viên đã nộp hồ sơ cho tin này",
+    );
+  }
+  const application =
+    this.applicationsRepository.create({
       jobId: createApplicationDto.jobId,
-      candidateId: createApplicationDto.candidateId,
-      resumeId: createApplicationDto.resumeId ?? null,
-      coverLetter: createApplicationDto.coverLetter ?? null,
+      candidateId:
+        createApplicationDto.candidateId,
+      resumeId:
+        createApplicationDto.resumeId ?? null,
+      coverLetter:
+        createApplicationDto.coverLetter ?? null,
       status: "new",
     });
-      
-    return this.applicationsRepository.save(application);
-  }
+  // 8. Lưu database
+  return this.applicationsRepository.save(
+    application,
+  );
+}
 
   async findAll(
     jobId?: number,
@@ -88,6 +127,7 @@ export class ApplicationsService {
       `Không tìm thấy hồ sơ có id ${id}`,
     );
     }
+    
     return application;
   }
 
