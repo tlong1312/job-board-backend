@@ -2,21 +2,22 @@ import {
   Injectable, 
   NotFoundException, 
   BadRequestException, 
-  ConflictException 
+  ConflictException,
+  ForbiddenException // Import thêm thư viện này
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from './entity/company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { UsersService } from '../users/users.service'; // Import UsersService
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     @InjectRepository(Company)
     private companiesRepository: Repository<Company>,
-    private usersService: UsersService, // Inject UsersService để gọi findOne
+    private usersService: UsersService,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto) {
@@ -39,20 +40,21 @@ export class CompaniesService {
   }
 
   async findAll() {
-  return await this.companiesRepository.find({ 
-    relations: {
-      owner: true 
-    } 
-  }); 
-}
+    return await this.companiesRepository.find({ 
+      relations: {
+        owner: true 
+      } 
+    }); 
+  }
 
   async findOne(id: number) {
-  const company = await this.companiesRepository.findOne({ 
-    where: { id },
-    relations: {
-      owner: true
-    } 
-  });
+    const company = await this.companiesRepository.findOne({ 
+      where: { id },
+      relations: {
+        owner: true
+      } 
+    });
+    
     if (!company) {
       throw new NotFoundException('Không tìm thấy công ty có id ' + id);
     }
@@ -60,8 +62,12 @@ export class CompaniesService {
     return company;
   }
 
-  async update(id: number, updateCompanyDto: UpdateCompanyDto) {
+  async update(id: number, updateCompanyDto: UpdateCompanyDto, currentUser: any) {
     const company = await this.findOne(id);
+
+    if (currentUser.role !== 'admin' && currentUser.id !== company.ownerId) {
+      throw new ForbiddenException('Bạn không có quyền chỉnh sửa thông tin của công ty này');
+    }
 
     if (updateCompanyDto.name) {
       const existingCompany = await this.companiesRepository.findOne({
@@ -78,9 +84,13 @@ export class CompaniesService {
     return this.findOne(id); 
   }
 
-  async remove(id: number) {
-    await this.findOne(id);
+  async remove(id: number, currentUser: any) {
+    const company = await this.findOne(id);
     
+    if (currentUser.role !== 'admin' && currentUser.id !== company.ownerId) {
+      throw new ForbiddenException('Bạn không có quyền xóa công ty này');
+    }
+
     await this.companiesRepository.delete(id);
     
     return {
