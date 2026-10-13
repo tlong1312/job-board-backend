@@ -9,7 +9,7 @@ import { ApplicationsModule } from "./modules/applications/applications.module";
 import { JobsModule } from "./modules/jobs/jobs.module";
 import { dbOptions, load } from "./config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-
+import { CompaniesModule } from './modules/companies/companies.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +28,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
     JobsModule,
     ApplicationsModule,
     ResumesModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
