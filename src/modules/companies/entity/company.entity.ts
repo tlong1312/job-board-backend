@@ -29,6 +29,12 @@ export class Company {
   @Column({ length: 255, nullable: true })
   address: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  province: string; 
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  ward: string;
+
   @Column({ name: 'logo_path', nullable: true })
   logoPath: string;
 
