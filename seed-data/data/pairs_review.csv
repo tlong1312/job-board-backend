@@ -1,0 +1,41 @@
+﻿pair_id,cv,cv_vi_tri_cap_do,job,job_title,label_auto,ly_do_tu_dong,label_human,split
+P01,R02,backend_nestjs / middle,J090,Backend Developer (NestJS),suitable,"compat=1.0, overlap=0.8, gap=-1",,tune
+P02,R16,qa / middle,J105,QA Tester,review,"compat=1.0, overlap=1.0, gap=-2",,tune
+P03,R10,fullstack / middle,J121,Frontend Engineer (React) (Middle),review,"compat=0.6, overlap=0.33, gap=0",,tune
+P04,R13,data_engineer / middle,J152,Chuyên viên phân tích dữ liệu Lead,review,"compat=0.6, overlap=0.33, gap=1",,tune
+P05,R09,frontend_vue / middle,J129,Frontend Engineer (React),review,"compat=0.6, overlap=0.6, gap=-1",,tune
+P06,R04,backend_java / intern,J294,Backend Developer (NestJS) (Junior),unsuitable,"compat=0.6, overlap=0.0, gap=1",,tune
+P07,R05,backend_dotnet / middle,J004,Lập trình viên .NET (Middle),suitable,"compat=1.0, overlap=0.83, gap=0",,tune
+P08,R03,backend_java / senior,J199,Java Backend Developer,suitable,"compat=1.0, overlap=1.0, gap=-1",,tune
+P09,R18,ba / junior,J060,IT Business Analyst,suitable,"compat=1.0, overlap=0.8, gap=1",,tune
+P10,R10,fullstack / middle,J109,Lập trình viên Backend Python (Middle),review,"compat=0.6, overlap=0.2, gap=0",,tune
+P11,R06,backend_python / junior,J180,Lập trình viên .NET,unsuitable,"compat=0.6, overlap=0.0, gap=1",,tune
+P12,R09,frontend_vue / middle,J099,Frontend Engineer (React) Lead,review,"compat=0.6, overlap=0.5, gap=1",,tune
+P13,R08,frontend_react / senior,J034,Frontend Developer (Vue) Lead,review,"compat=0.6, overlap=0.33, gap=0",,tune
+P14,R13,data_engineer / middle,J076,Machine Learning Engineer,review,"compat=0.6, overlap=0.4, gap=-1",,tune
+P15,R12,mobile_android / middle,J226,C# Backend Developer,unsuitable,"compat=0.0, overlap=0.0, gap=-2",,tune
+P16,R11,mobile_flutter / junior,J153,Fresher Flutter Developer,suitable,"compat=1.0, overlap=0.75, gap=-1",,tune
+P17,R14,data_analyst / junior,J026,C# Backend Developer Lead,unsuitable,"compat=0.0, overlap=0.0, gap=2",,tune
+P18,R02,backend_nestjs / middle,J098,Junior Lập trình viên Java Spring Boot,review,"compat=0.6, overlap=0.2, gap=-1",,tune
+P19,R05,backend_dotnet / middle,J058,C# Backend Developer,suitable,"compat=1.0, overlap=0.67, gap=1",,tune
+P20,R19,ui_ux / middle,J130,Lập trình viên Java Spring Boot (Middle),unsuitable,"compat=0.0, overlap=0.0, gap=0",,tune
+P21,R01,backend_nestjs / junior,J241,Lập trình viên Frontend ReactJS,unsuitable,"compat=0.0, overlap=0.0, gap=0",,tune
+P22,R14,data_analyst / junior,J057,Data Analyst,suitable,"compat=1.0, overlap=0.8, gap=1",,tune
+P23,R14,data_analyst / junior,J266,Kỹ sư dữ liệu,unsuitable,"compat=0.6, overlap=0.33, gap=2",,tune
+P24,R06,backend_python / junior,J154,Lập trình viên Backend Python,unsuitable,"compat=1.0, overlap=0.8, gap=2",,tune
+P25,R12,mobile_android / middle,J191,C# Backend Developer,unsuitable,"compat=0.0, overlap=0.4, gap=0",,tune
+P26,R03,backend_java / senior,J254,Senior Fullstack Engineer,unsuitable,"compat=0.6, overlap=0.14, gap=0",,test
+P27,R02,backend_nestjs / middle,J009,Lập trình viên Backend NestJS (Junior),suitable,"compat=1.0, overlap=0.67, gap=-1",,tune
+P28,R07,frontend_react / junior,J036,Frontend Engineer (React),suitable,"compat=1.0, overlap=0.67, gap=1",,tune
+P29,R06,backend_python / junior,J145,.NET Developer (Junior),unsuitable,"compat=0.6, overlap=0.0, gap=0",,test
+P30,R01,backend_nestjs / junior,J222,Backend Developer (NestJS),suitable,"compat=1.0, overlap=0.6, gap=1",,test
+P31,R05,backend_dotnet / middle,J237,Junior Node.js Backend Engineer,review,"compat=0.6, overlap=0.2, gap=-1",,tune
+P32,R07,frontend_react / junior,J096,React Frontend Developer (Junior),suitable,"compat=1.0, overlap=0.75, gap=0",,test
+P33,R01,backend_nestjs / junior,J158,Kỹ sư DevOps,unsuitable,"compat=0.0, overlap=0.4, gap=1",,test
+P34,R17,devops / middle,J164,DevOps Engineer,suitable,"compat=1.0, overlap=0.83, gap=1",,test
+P35,R03,backend_java / senior,J127,Thực tập sinh Node.js Backend Engineer,review,"compat=0.6, overlap=0.2, gap=-3",,test
+P36,R17,devops / middle,J015,Lập trình viên Android,unsuitable,"compat=0.0, overlap=0.2, gap=1",,test
+P37,R20,frontend_react / intern,J097,"Fullstack Developer (React, Node.js) (Junior)",review,"compat=0.6, overlap=0.4, gap=1",,test
+P38,R07,frontend_react / junior,J069,Frontend Engineer (React) (Junior),suitable,"compat=1.0, overlap=0.8, gap=0",,test
+P39,R10,fullstack / middle,J042,React Frontend Developer,review,"compat=0.6, overlap=0.5, gap=0",,test
+P40,R09,frontend_vue / middle,J007,Senior Lập trình viên Frontend ReactJS,review,"compat=0.6, overlap=0.4, gap=1",,test

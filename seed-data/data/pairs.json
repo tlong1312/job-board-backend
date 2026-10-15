@@ -1,0 +1,877 @@
+[
+  {
+    "pair_id": "P01",
+    "resume_ref": "R02",
+    "job_ref": "J090",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.8,
+      "level_gap": -1,
+      "matched_skills": [
+        "Docker",
+        "NestJS",
+        "Node.js",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "Elasticsearch"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P02",
+    "resume_ref": "R16",
+    "job_ref": "J105",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 1.0,
+      "level_gap": -2,
+      "matched_skills": [
+        "Jira",
+        "Postman",
+        "Test case"
+      ],
+      "missing_skills": []
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P03",
+    "resume_ref": "R10",
+    "job_ref": "J121",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.33,
+      "level_gap": 0,
+      "matched_skills": [
+        "React",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "GraphQL",
+        "HTML/CSS",
+        "Jest",
+        "Next.js"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P04",
+    "resume_ref": "R13",
+    "job_ref": "J152",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.33,
+      "level_gap": 1,
+      "matched_skills": [
+        "Python",
+        "SQL"
+      ],
+      "missing_skills": [
+        "Excel",
+        "Git",
+        "Pandas",
+        "Power BI"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P05",
+    "resume_ref": "R09",
+    "job_ref": "J129",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.6,
+      "level_gap": -1,
+      "matched_skills": [
+        "Git",
+        "REST API",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "React",
+        "Tailwind CSS"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P06",
+    "resume_ref": "R04",
+    "job_ref": "J294",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.0,
+      "level_gap": 1,
+      "matched_skills": [],
+      "missing_skills": [
+        "Elasticsearch",
+        "NestJS",
+        "Node.js",
+        "PostgreSQL",
+        "RabbitMQ",
+        "TypeScript"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P07",
+    "resume_ref": "R05",
+    "job_ref": "J004",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.83,
+      "level_gap": 0,
+      "matched_skills": [
+        ".NET",
+        "C#",
+        "Docker",
+        "REST API",
+        "SQL Server"
+      ],
+      "missing_skills": [
+        "Redis"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P08",
+    "resume_ref": "R03",
+    "job_ref": "J199",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 1.0,
+      "level_gap": -1,
+      "matched_skills": [
+        "Java",
+        "MySQL",
+        "REST API",
+        "Spring Boot"
+      ],
+      "missing_skills": []
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P09",
+    "resume_ref": "R18",
+    "job_ref": "J060",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.8,
+      "level_gap": 1,
+      "matched_skills": [
+        "Agile/Scrum",
+        "Jira",
+        "UML",
+        "User Story"
+      ],
+      "missing_skills": [
+        "Excel"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P10",
+    "resume_ref": "R10",
+    "job_ref": "J109",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.2,
+      "level_gap": 0,
+      "matched_skills": [
+        "PostgreSQL"
+      ],
+      "missing_skills": [
+        "Django",
+        "MongoDB",
+        "Python",
+        "Unit test"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P11",
+    "resume_ref": "R06",
+    "job_ref": "J180",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.0,
+      "level_gap": 1,
+      "matched_skills": [],
+      "missing_skills": [
+        ".NET",
+        "C#",
+        "RabbitMQ",
+        "Redis"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P12",
+    "resume_ref": "R09",
+    "job_ref": "J099",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.5,
+      "level_gap": 1,
+      "matched_skills": [
+        "Git",
+        "HTML/CSS",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "Jest",
+        "Next.js",
+        "React"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P13",
+    "resume_ref": "R08",
+    "job_ref": "J034",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.33,
+      "level_gap": 0,
+      "matched_skills": [
+        "Git",
+        "Jest"
+      ],
+      "missing_skills": [
+        "HTML/CSS",
+        "JavaScript",
+        "Tailwind CSS",
+        "Vue.js"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P14",
+    "resume_ref": "R13",
+    "job_ref": "J076",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.4,
+      "level_gap": -1,
+      "matched_skills": [
+        "Docker",
+        "Python"
+      ],
+      "missing_skills": [
+        "FastAPI",
+        "Machine Learning",
+        "NLP"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P15",
+    "resume_ref": "R12",
+    "job_ref": "J226",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.0,
+      "level_gap": -2,
+      "matched_skills": [],
+      "missing_skills": [
+        ".NET",
+        "C#",
+        "RabbitMQ",
+        "Redis"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P16",
+    "resume_ref": "R11",
+    "job_ref": "J153",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.75,
+      "level_gap": -1,
+      "matched_skills": [
+        "Dart",
+        "Flutter",
+        "REST API"
+      ],
+      "missing_skills": [
+        "Unit test"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P17",
+    "resume_ref": "R14",
+    "job_ref": "J026",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.0,
+      "level_gap": 2,
+      "matched_skills": [],
+      "missing_skills": [
+        ".NET",
+        "C#",
+        "Docker",
+        "RabbitMQ",
+        "SQL Server"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P18",
+    "resume_ref": "R02",
+    "job_ref": "J098",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.2,
+      "level_gap": -1,
+      "matched_skills": [
+        "Redis"
+      ],
+      "missing_skills": [
+        "Java",
+        "Kubernetes",
+        "Microservices",
+        "Spring Boot"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P19",
+    "resume_ref": "R05",
+    "job_ref": "J058",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.67,
+      "level_gap": 1,
+      "matched_skills": [
+        ".NET",
+        "C#",
+        "Docker",
+        "SQL Server"
+      ],
+      "missing_skills": [
+        "Microservices",
+        "Redis"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P20",
+    "resume_ref": "R19",
+    "job_ref": "J130",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.0,
+      "level_gap": 0,
+      "matched_skills": [],
+      "missing_skills": [
+        "Docker",
+        "Java",
+        "MySQL",
+        "REST API",
+        "Spring Boot"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P21",
+    "resume_ref": "R01",
+    "job_ref": "J241",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.0,
+      "level_gap": 0,
+      "matched_skills": [],
+      "missing_skills": [
+        "HTML/CSS",
+        "JavaScript",
+        "Jest",
+        "REST API",
+        "React"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P22",
+    "resume_ref": "R14",
+    "job_ref": "J057",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.8,
+      "level_gap": 1,
+      "matched_skills": [
+        "Excel",
+        "Power BI",
+        "Python",
+        "SQL"
+      ],
+      "missing_skills": [
+        "Git"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P23",
+    "resume_ref": "R14",
+    "job_ref": "J266",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.33,
+      "level_gap": 2,
+      "matched_skills": [
+        "Python",
+        "SQL"
+      ],
+      "missing_skills": [
+        "Airflow",
+        "ETL",
+        "Git",
+        "PostgreSQL"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P24",
+    "resume_ref": "R06",
+    "job_ref": "J154",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.8,
+      "level_gap": 2,
+      "matched_skills": [
+        "Docker",
+        "FastAPI",
+        "Git",
+        "Python"
+      ],
+      "missing_skills": [
+        "MongoDB"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P25",
+    "resume_ref": "R12",
+    "job_ref": "J191",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.4,
+      "level_gap": 0,
+      "matched_skills": [
+        "Git",
+        "REST API"
+      ],
+      "missing_skills": [
+        ".NET",
+        "C#",
+        "Docker"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P26",
+    "resume_ref": "R03",
+    "job_ref": "J254",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.14,
+      "level_gap": 0,
+      "matched_skills": [
+        "REST API"
+      ],
+      "missing_skills": [
+        "Git",
+        "MongoDB",
+        "NestJS",
+        "Node.js",
+        "React",
+        "Redis"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P27",
+    "resume_ref": "R02",
+    "job_ref": "J009",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.67,
+      "level_gap": -1,
+      "matched_skills": [
+        "NestJS",
+        "Node.js",
+        "PostgreSQL",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "GraphQL",
+        "Jest"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P28",
+    "resume_ref": "R07",
+    "job_ref": "J036",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.67,
+      "level_gap": 1,
+      "matched_skills": [
+        "Git",
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "GraphQL",
+        "Jest"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P29",
+    "resume_ref": "R06",
+    "job_ref": "J145",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.0,
+      "level_gap": 0,
+      "matched_skills": [],
+      "missing_skills": [
+        ".NET",
+        "C#",
+        "RabbitMQ",
+        "SQL Server"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P30",
+    "resume_ref": "R01",
+    "job_ref": "J222",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.6,
+      "level_gap": 1,
+      "matched_skills": [
+        "NestJS",
+        "Node.js",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "Elasticsearch",
+        "Redis"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P31",
+    "resume_ref": "R05",
+    "job_ref": "J237",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.2,
+      "level_gap": -1,
+      "matched_skills": [
+        "Docker"
+      ],
+      "missing_skills": [
+        "Microservices",
+        "NestJS",
+        "Node.js",
+        "TypeScript"
+      ]
+    },
+    "split": "tune"
+  },
+  {
+    "pair_id": "P32",
+    "resume_ref": "R07",
+    "job_ref": "J096",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.75,
+      "level_gap": 0,
+      "matched_skills": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "GraphQL"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P33",
+    "resume_ref": "R01",
+    "job_ref": "J158",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.4,
+      "level_gap": 1,
+      "matched_skills": [
+        "Docker",
+        "Git"
+      ],
+      "missing_skills": [
+        "AWS",
+        "CI/CD",
+        "Linux"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P34",
+    "resume_ref": "R17",
+    "job_ref": "J164",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.83,
+      "level_gap": 1,
+      "matched_skills": [
+        "AWS",
+        "CI/CD",
+        "Docker",
+        "Kubernetes",
+        "Linux"
+      ],
+      "missing_skills": [
+        "Redis"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P35",
+    "resume_ref": "R03",
+    "job_ref": "J127",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.2,
+      "level_gap": -3,
+      "matched_skills": [
+        "REST API"
+      ],
+      "missing_skills": [
+        "NestJS",
+        "Node.js",
+        "Redis",
+        "TypeScript"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P36",
+    "resume_ref": "R17",
+    "job_ref": "J015",
+    "label_auto": "unsuitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.0,
+      "skill_overlap": 0.2,
+      "level_gap": 1,
+      "matched_skills": [
+        "CI/CD"
+      ],
+      "missing_skills": [
+        "Android",
+        "Kotlin",
+        "REST API",
+        "Unit test"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P37",
+    "resume_ref": "R20",
+    "job_ref": "J097",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.4,
+      "level_gap": 1,
+      "matched_skills": [
+        "Git",
+        "React"
+      ],
+      "missing_skills": [
+        "Docker",
+        "Node.js",
+        "PostgreSQL"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P38",
+    "resume_ref": "R07",
+    "job_ref": "J069",
+    "label_auto": "suitable",
+    "label_human": null,
+    "reason": {
+      "role_compat": 1.0,
+      "skill_overlap": 0.8,
+      "level_gap": 0,
+      "matched_skills": [
+        "Git",
+        "HTML/CSS",
+        "React",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "REST API"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P39",
+    "resume_ref": "R10",
+    "job_ref": "J042",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.5,
+      "level_gap": 0,
+      "matched_skills": [
+        "React",
+        "TypeScript"
+      ],
+      "missing_skills": [
+        "GraphQL",
+        "HTML/CSS"
+      ]
+    },
+    "split": "test"
+  },
+  {
+    "pair_id": "P40",
+    "resume_ref": "R09",
+    "job_ref": "J007",
+    "label_auto": "review",
+    "label_human": null,
+    "reason": {
+      "role_compat": 0.6,
+      "skill_overlap": 0.4,
+      "level_gap": 1,
+      "matched_skills": [
+        "HTML/CSS",
+        "JavaScript"
+      ],
+      "missing_skills": [
+        "Jest",
+        "Next.js",
+        "React"
+      ]
+    },
+    "split": "test"
+  }
+]

@@ -18,9 +18,10 @@ import { Public } from "commons/decorators/public.decorator";
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post("register")
+  @Public()
   @ApiOperation({ summary: "Đăng ký tài khoản" })
   @ApiResponse({
     status: 201,

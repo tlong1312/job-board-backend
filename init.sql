@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS companies (
   description TEXT,
   website     VARCHAR(255),
   address     VARCHAR(255),
+  province    VARCHAR(80), 
+  ward        VARCHAR(80),
   logo_path   VARCHAR(255),
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
@@ -73,6 +75,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   title       VARCHAR(150) NOT NULL,
   description TEXT,
   location    VARCHAR(150),
+  province    VARCHAR(80),
   job_type    VARCHAR(20)  NOT NULL DEFAULT 'full_time'
               CHECK (job_type IN ('full_time', 'part_time', 'internship', 'contract')),
   level       VARCHAR(20)
