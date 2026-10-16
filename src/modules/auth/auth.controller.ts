@@ -21,6 +21,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post("register")
+  @Public()
   @ApiOperation({ summary: "Đăng ký tài khoản" })
   @ApiResponse({
     status: 201,
