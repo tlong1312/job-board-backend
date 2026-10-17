@@ -11,10 +11,6 @@ export class CreateApplicationDto {
   @Min(1)
   jobId: number;
 
-  @IsInt()
-  @Min(1)
-  candidateId: number;
-
   @IsOptional()
   @IsInt()
   @Min(1)
