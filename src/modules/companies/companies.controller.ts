@@ -37,6 +37,18 @@ export class CompaniesController {
     return this.companiesService.findOne(id);
   }
 
+  @Get(':ownerId')
+  @Public()
+  @ApiOperation({ summary: 'Lấy thông tin chi tiết một công ty theo ID người dùng' })
+  async findByOwnerId(@Param('ownerId', ParseIntPipe) ownerId: number) {
+    const companies = await this.companiesService.findByOwnerId(ownerId);
+    return {
+      statusCode: 200,
+      message: `Lấy danh sách công ty của ownerId ${ownerId} thành công`,
+      data: companies,
+    };
+  }
+  
   @Patch(':id')
   @Roles('employer')
   @ApiOperation({ summary: 'Cập nhật thông tin công ty' })

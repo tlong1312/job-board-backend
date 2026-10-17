@@ -3,7 +3,7 @@ import {
   NotFoundException, 
   BadRequestException, 
   ConflictException,
-  ForbiddenException // Import thêm thư viện này
+  ForbiddenException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -60,6 +60,24 @@ export class CompaniesService {
     }
     
     return company;
+  }
+
+  async findByOwnerId(ownerId: number) {
+    const owner = await this.usersService.findOne(ownerId);
+    
+    if (!owner) {
+      throw new NotFoundException(`Không tìm thấy người dùng có id là ${ownerId}`);
+    }
+    const companies = await this.companiesRepository.find({
+      where: { ownerId },
+      relations: {
+        owner: true 
+      }
+    });
+    if (companies.length === 0) {
+      throw new NotFoundException(`Người dùng với id ${ownerId} hiện chưa tạo công ty nào`);
+    }
+    return companies;
   }
 
   async update(id: number, updateCompanyDto: UpdateCompanyDto, currentUser: any) {

@@ -2,9 +2,9 @@ import { IsNotEmpty, IsNumber, IsString, MaxLength, IsUrl, IsOptional } from 'cl
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateCompanyDto {
-  @ApiProperty({ example: 1, description: 'ID của chủ sở hữu công ty (phải là employer)' })
-  @IsNotEmpty({ message: 'ownerId không được để trống' })
-  @IsNumber({}, { message: 'ownerId phải là dạng số' })
+  // @ApiProperty({ example: 1, description: 'ID của chủ sở hữu công ty (phải là employer)' })
+  // @IsNotEmpty({ message: 'ownerId không được để trống' })
+  // @IsNumber({}, { message: 'ownerId phải là dạng số' })
   ownerId: number;
 
   @ApiProperty({ example: 'Công ty Cổ phần Công nghệ ABC', description: 'Tên công ty (tối đa 200 ký tự)' })
