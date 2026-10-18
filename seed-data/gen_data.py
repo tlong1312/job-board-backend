@@ -891,14 +891,28 @@ def rule_label(cv, job):
     js, cs = set(job["skills"]), set(cv["skills"])
     overlap = len(js & cs) / len(js)
     gap = LEVEL_IDX[job["level"]] - LEVEL_IDX[cv["level"]]
-    if c == 0 or overlap < .2 or gap >= 2:
+    # Kỹ năng đứng đầu danh sách của tin là kỹ năng bắt buộc (mục "Thành thạo"),
+    # phần còn lại là kỹ năng ưu tiên (mục "Có kinh nghiệm hoặc biết sử dụng").
+    n_core = len(ROLES[M(job)["role"]]["core"])
+    miss_must = [s for s in job["skills"][:n_core] if s not in cs]
+    miss_nice = [s for s in job["skills"][n_core:] if s not in cs]
+    # Luật (đã siết lại): thiếu 2 kỹ năng bắt buộc, hoặc thiếu 1 kỹ năng bắt buộc mà còn thấp hơn
+    # tin một cấp trở lên, hoặc thấp hơn 2 cấp, hoặc khác loại vị trí -> không phù hợp.
+    # Phù hợp chỉ khi đúng loại vị trí, đủ kỹ năng bắt buộc, không thấp hơn tin cấp nào,
+    # và thiếu tối đa 1 kỹ năng ưu tiên. Còn lại là cần xem xét.
+    if c == 0 or overlap < .2 or gap >= 2 or len(miss_must) >= 2 or (miss_must and gap >= 1):
         lab = "unsuitable"
-    elif c == 1.0 and overlap >= .6 and -1 <= gap <= 1:
+    elif c < 1.0 and (miss_must or len(miss_nice) >= 3):
+        # Bổ sung sau khi chấm tay: khác loại vị trí mà còn thiếu kỹ năng bắt buộc
+        # hoặc thiếu từ 3 kỹ năng ưu tiên trở lên thì không đáng xem.
+        lab = "unsuitable"
+    elif c == 1.0 and not miss_must and -1 <= gap <= 0 and len(miss_nice) <= 1:
         lab = "suitable"
     else:
         lab = "review"
     return lab, dict(role_compat=c, skill_overlap=round(overlap, 2), level_gap=gap,
-                     matched_skills=sorted(js & cs), missing_skills=sorted(js - cs))
+                     matched_skills=sorted(js & cs), missing_skills=sorted(js - cs),
+                     missing_must_have=miss_must, missing_nice_to_have=miss_nice)
 
 
 def build_pairs(jobs, resumes):

@@ -53,17 +53,17 @@
     "hybrid": 16
   },
   "nhan_cap": {
-    "suitable": 13,
-    "review": 14,
-    "unsuitable": 13
+    "suitable": 6,
+    "review": 9,
+    "unsuitable": 25
   },
   "tach_cap": {
-    "tune/suitable": 9,
-    "tune/review": 10,
-    "tune/unsuitable": 9,
-    "test/unsuitable": 4,
-    "test/suitable": 4,
-    "test/review": 4
+    "tune/suitable": 4,
+    "tune/review": 9,
+    "tune/unsuitable": 15,
+    "test/unsuitable": 7,
+    "test/review": 3,
+    "test/suitable": 2
   },
   "tach_truy_van": {
     "keyword/tune": 7,
@@ -136,5 +136,10 @@
     "Q28": 18,
     "Q29": 7,
     "Q30": 33
+  },
+  "nhan_tay": {
+    "suitable": 7,
+    "unsuitable": 26,
+    "review": 7
   }
 }
