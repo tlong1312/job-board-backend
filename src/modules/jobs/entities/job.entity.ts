@@ -48,6 +48,9 @@ export class Job {
   @Column({ type: "varchar", length: 150, nullable: true })
   location: string | null;
 
+  @Column({ type: "varchar", length: 80, nullable: true })
+  province: string | null;
+
   @Column({
     name: "job_type",
     type: "varchar",

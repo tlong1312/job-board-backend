@@ -57,6 +57,16 @@ export class CreateJobDto {
   location?: string;
 
   @ApiPropertyOptional({
+    example: "Hà Nội",
+    description: "Tỉnh thành làm việc",
+    maxLength: 80,
+  })
+  @IsOptional()
+  @IsString({ message: "Tỉnh/thành phải là chuỗi" })
+  @MaxLength(80, { message: "Tỉnh thành tối đa 80 ký tự" })
+  province?: string;
+
+  @ApiPropertyOptional({
     enum: JOB_TYPES,
     default: "full_time",
     description: "Hình thức làm việc",

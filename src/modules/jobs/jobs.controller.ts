@@ -34,7 +34,7 @@ import { JobsService } from "./jobs.service";
 import { CreateJobDto } from "./dto/create-job.dto";
 import { UpdateJobDto } from "./dto/update-job.dto";
 import { QueryJobDto } from "./dto/query-job.dto";
- 
+
 @ApiBearerAuth()
 @ApiTags("jobs")
 @Controller("jobs")
@@ -43,7 +43,7 @@ export class JobsController {
     private readonly jobsService: JobsService,
     private readonly authService: AuthService,
   ) {}
- 
+
   /**
    * API @Public() không đi qua bước gắn user của JwtAuthGuard, nên tự đọc token ở đây.
    * Không có token / token sai / hết hạn: coi là khách (undefined), không ném lỗi.
@@ -60,7 +60,7 @@ export class JobsController {
       return undefined;
     }
   }
- 
+
   @Post()
   @Roles("employer")
   @ApiOperation({
@@ -79,7 +79,7 @@ export class JobsController {
   create(@Body() createJobDto: CreateJobDto, @CurrentUser() user: JwtUser) {
     return this.jobsService.create(createJobDto, user);
   }
- 
+
   @Get()
   @Public()
   @ApiOperation({
@@ -93,7 +93,7 @@ export class JobsController {
     const viewer = await this.getViewer(req.headers.authorization);
     return this.jobsService.findAll(query, viewer);
   }
- 
+
   @Get(":id")
   @Public()
   @ApiOperation({ summary: "Xem một tin tuyển dụng theo id" })
@@ -108,7 +108,7 @@ export class JobsController {
     const viewer = await this.getViewer(req.headers.authorization);
     return this.jobsService.findOneForViewer(id, viewer);
   }
- 
+
   @Patch(":id")
   @Roles("employer", "admin")
   @ApiOperation({
@@ -132,7 +132,7 @@ export class JobsController {
   ) {
     return this.jobsService.update(id, updateJobDto, user);
   }
- 
+
   @Patch(":id/block")
   @Roles("admin")
   @ApiOperation({ summary: "Admin khoá tin (status = blocked)" })
@@ -144,7 +144,7 @@ export class JobsController {
   block(@Param("id", ParseIntPipe) id: number) {
     return this.jobsService.block(id);
   }
- 
+
   @Delete(":id")
   @Roles("employer", "admin")
   @ApiOperation({ summary: "Chủ tin hoặc admin xoá tin" })
@@ -160,4 +160,3 @@ export class JobsController {
     return this.jobsService.remove(id, user);
   }
 }
- 
