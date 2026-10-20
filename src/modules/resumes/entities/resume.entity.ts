@@ -9,6 +9,9 @@ export class Resume {
   userId: number;
 
   @Column()
+  fileUrl: string;
+
+  @Column()
   fileName: string;
 
   @Column()
