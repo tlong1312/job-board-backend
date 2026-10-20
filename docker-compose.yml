@@ -14,6 +14,7 @@ services:
     volumes:
       - job_board_pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./ai-init.sql:/docker-entrypoint-initdb.d/zz-ai-init.sql
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
