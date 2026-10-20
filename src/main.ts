@@ -5,8 +5,11 @@ import { ServiceErrorsFilter } from "commons/filters/service.error.filter";
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { join } from "path";
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
   app.enableCors({
@@ -14,6 +17,11 @@ async function bootstrap() {
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
   });
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
+
 
   app.setGlobalPrefix("api");
   app.useGlobalFilters(new ServiceErrorsFilter());
@@ -23,6 +31,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  
   const config = new DocumentBuilder()
     .setTitle("NestJS API")
     .setDescription("The NestJS API description")
