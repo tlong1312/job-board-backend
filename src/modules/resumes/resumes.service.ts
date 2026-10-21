@@ -5,6 +5,8 @@ import { Resume } from './entities/resume.entity';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
 import { UsersService } from '../users/users.service';
+import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class ResumesService {
@@ -67,8 +69,26 @@ export class ResumesService {
   }
 
   async remove(id: number) {
-    const resume = await this.findOne(id);
-    await this.resumesRepository.remove(resume);
-    return { message: 'Đã xóa CV thành công' };
+    const resume = await this.resumesRepository.findOne({ where: { id } });
+    if (!resume) {
+      throw new NotFoundException(`Không tìm thấy CV có id ${id}`);
+    }
+
+    await this.resumesRepository.delete(id);
+    if (resume.fileName) {
+      const filePath = join(process.cwd(), 'uploads', resume.fileName);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath); 
+        } catch (error) {
+          console.error(`Không thể xóa file vật lý: ${filePath}`, error);
+        }
+      }
+    }
+
+    return { 
+      statusCode: 200, 
+      message: 'Đã xóa thành công CV và file đính kèm' 
+    };
   }
 }
