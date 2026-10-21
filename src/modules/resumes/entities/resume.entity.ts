@@ -1,31 +1,37 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity('resumes')
+@Entity("resumes")
 export class Resume {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: "user_id", type: "int" })
   userId: number;
 
-  @Column()
+  @Column({ name: "file_path", type: "varchar", length: 500 })
   fileUrl: string;
 
-  @Column()
+  @Column({ name: "file_name", type: "varchar", length: 255 })
   fileName: string;
 
-  @Column()
-  mimeType: string;
+  @Column({ name: "mime_type", type: "varchar", length: 100, nullable: true })
+  mimeType: string | null;
 
-  @Column()
-  fileSize: number;
+  @Column({ name: "file_size", type: "int", nullable: true })
+  fileSize: number | null;
 
-  @Column({ default: false })
+  @Column({ name: "is_default", type: "boolean", default: false })
   isDefault: boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @CreateDateColumn({
+    name: "uploaded_at",
+    type: "timestamptz",
+  })
+  uploadedAt: Date;
 }
