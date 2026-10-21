@@ -56,7 +56,7 @@ export class CompaniesService {
     });
     
     if (!company) {
-      throw new NotFoundException('Không tìm thấy công ty có id ' + id);
+      throw new NotFoundException('Không tìm thấy công ty có id ${id}');
     }
     
     return company;

@@ -37,7 +37,7 @@ export class CompaniesController {
     return this.companiesService.findOne(id);
   }
 
-  @Get(':ownerId')
+  @Get('owner/:ownerId')
   @Public()
   @ApiOperation({ summary: 'Lấy thông tin chi tiết một công ty theo ID người dùng' })
   async findByOwnerId(@Param('ownerId', ParseIntPipe) ownerId: number) {
