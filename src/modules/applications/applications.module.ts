@@ -5,7 +5,6 @@ import { ApplicationsController } from "./applications.controller";
 import { ApplicationEntity } from "./entities/application.entity";
 import { ApplicationStatusHistory } from "./entities/application-status-history.entity";
 import { JobsModule } from "../jobs/jobs.module";
-import { UsersModule } from "../users/users.module";
 
 @Module({
   imports: 
@@ -14,7 +13,6 @@ import { UsersModule } from "../users/users.module";
       ApplicationStatusHistory,
     ]),
     JobsModule,
-    UsersModule
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

@@ -3,17 +3,26 @@ import { ApplicationsService } from "./applications.service";
 import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationStatusDto } from "./dto/update-application-status.dto";
 import {
+  CurrentUser,
+  JwtUser,
+} from "commons/decorators/current-user.decorator";
+import { Roles } from "commons/decorators/roles.decorator";
+import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 
+@ApiBearerAuth()
 @ApiTags("applications")
 @Controller("applications")
 export class ApplicationsController {
@@ -22,6 +31,7 @@ export class ApplicationsController {
   ) {}
 
   @Post()
+  @Roles("candidate")
   @ApiOperation({
     summary: "Ứng viên nộp hồ sơ vào tin tuyển dụng",
   })
@@ -30,26 +40,32 @@ export class ApplicationsController {
   })
   @ApiBadRequestResponse({
     description:
-      "Dữ liệu không hợp lệ / tin đã đóng hoặc bị khoá / tin đã hết hạn / người dùng không phải ứng viên / resumeId không tồn tại",
+      "Dữ liệu không hợp lệ / tin không open / tin đã hết hạn",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Chưa đăng nhập",
+  })
+  @ApiForbiddenResponse({
+    description: "Không phải ứng viên",
   })
   @ApiNotFoundResponse({
-    description:
-      "Không tìm thấy tin tuyển dụng hoặc ứng viên",
+    description: "Không tìm thấy tin tuyển dụng",
   })
   @ApiConflictResponse({
-    description:
-      "Ứng viên đã nộp hồ sơ cho tin tuyển dụng này",
+    description: "Ứng viên đã nộp tin này rồi",
   })
   create(
-    @Body()
-    createApplicationDto: CreateApplicationDto,
+    @Body() dto: CreateApplicationDto,
+    @CurrentUser("id") candidateId: number,
   ) {
     return this.applicationsService.create(
-      createApplicationDto,
+      dto,
+      candidateId,
     );
   }
 
   @Get()
+  @Roles("candidate", "employer")
   @ApiOperation({
     summary: "Lấy danh sách hồ sơ ứng tuyển",
   })
@@ -57,42 +73,38 @@ export class ApplicationsController {
     name: "jobId",
     required: false,
     type: Number,
-    description: "Lọc hồ sơ theo id tin tuyển dụng",
-  })
-  @ApiQuery({
-    name: "candidateId",
-    required: false,
-    type: Number,
-    description: "Lọc hồ sơ theo id ứng viên",
+    description:
+      "Employer truyền jobId để xem hồ sơ của tin tuyển dụng",
   })
   @ApiOkResponse({
     description: "Mảng hồ sơ ứng tuyển",
   })
-  @ApiBadRequestResponse({
-    description: "jobId hoặc candidateId không phải số",
+  @ApiUnauthorizedResponse({
+    description: "Chưa đăng nhập",
+  })
+  @ApiForbiddenResponse({
+    description:
+      "Tin tuyển dụng không thuộc nhà tuyển dụng",
   })
   findAll(
+    @CurrentUser() currentUser: JwtUser,
+
     @Query(
       "jobId",
       new ParseIntPipe({ optional: true }),
     )
     jobId?: number,
-
-    @Query(
-      "candidateId",
-      new ParseIntPipe({ optional: true }),
-    )
-    candidateId?: number,
   ) {
     return this.applicationsService.findAll(
+      currentUser,
       jobId,
-      candidateId,
     );
   }
 
   @Get(":id")
+  @Roles("candidate")
   @ApiOperation({
-    summary: "Xem một hồ sơ ứng tuyển theo id",
+    summary: "Ứng viên xem chi tiết hồ sơ của mình",
   })
   @ApiParam({
     name: "id",
@@ -103,21 +115,32 @@ export class ApplicationsController {
     description: "Thông tin hồ sơ ứng tuyển",
   })
   @ApiBadRequestResponse({
-    description: "id không phải số",
+    description:
+      "jobId không phải số hoặc nhà tuyển dụng không cung cấp jobId",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Chưa đăng nhập",
+  })
+  @ApiForbiddenResponse({
+    description: "Hồ sơ không thuộc ứng viên",
   })
   @ApiNotFoundResponse({
-    description: "Không tìm thấy hồ sơ ứng tuyển",
+    description: "Không tìm thấy hồ sơ",
   })
   findOne(
-    @Param("id", ParseIntPipe)
-    id: number,
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser("id") candidateId: number,
   ) {
-    return this.applicationsService.findOne(id);
+    return this.applicationsService.findOneForCandidate(
+      id,
+      candidateId,
+    );
   }
 
   @Patch(":id/status")
+  @Roles("employer")
   @ApiOperation({
-    summary: "Cập nhật trạng thái hồ sơ ứng tuyển",
+    summary: "Nhà tuyển dụng cập nhật trạng thái hồ sơ",
   })
   @ApiParam({
     name: "id",
@@ -126,30 +149,35 @@ export class ApplicationsController {
   })
   @ApiOkResponse({
     description:
-      "Hồ sơ được cập nhật trạng thái và ghi lịch sử thành công",
+      "Cập nhật trạng thái và ghi lịch sử thành công",
   })
   @ApiBadRequestResponse({
     description:
-      "Dữ liệu không hợp lệ / hồ sơ đã ở trạng thái này / hồ sơ đã bị từ chối / changedBy không tồn tại",
+      "Trạng thái không hợp lệ / trùng trạng thái / hồ sơ đã rejected",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Chưa đăng nhập",
+  })
+  @ApiForbiddenResponse({
+    description: "Không phải chủ tin tuyển dụng",
   })
   @ApiNotFoundResponse({
-    description: "Không tìm thấy hồ sơ ứng tuyển",
+    description: "Không tìm thấy hồ sơ",
   })
   changeStatus(
-    @Param("id", ParseIntPipe)
-    id: number,
-
-    @Body()
-    updateApplicationStatusDto:
-      UpdateApplicationStatusDto,
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: UpdateApplicationStatusDto,
+    @CurrentUser("id") employerId: number,
   ) {
     return this.applicationsService.changeStatus(
       id,
-      updateApplicationStatusDto,
+      dto,
+      employerId,
     );
   }
 
   @Get(":id/history")
+  @Roles("candidate", "employer")
   @ApiOperation({
     summary: "Xem lịch sử thay đổi trạng thái hồ sơ",
   })
@@ -159,25 +187,32 @@ export class ApplicationsController {
     description: "Id hồ sơ ứng tuyển",
   })
   @ApiOkResponse({
-    description:
-      "Danh sách lịch sử thay đổi trạng thái của hồ sơ",
+    description: "Lịch sử trạng thái hồ sơ",
   })
-  @ApiBadRequestResponse({
-    description: "id không phải số",
+  @ApiUnauthorizedResponse({
+    description: "Chưa đăng nhập",
+  })
+  @ApiForbiddenResponse({
+    description:
+      "Không phải ứng viên chủ hồ sơ hoặc nhà tuyển dụng chủ tin",
   })
   @ApiNotFoundResponse({
-    description: "Không tìm thấy hồ sơ ứng tuyển",
+    description: "Không tìm thấy hồ sơ",
   })
   getHistory(
-    @Param("id", ParseIntPipe)
-    id: number,
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser() currentUser: JwtUser,
   ) {
-    return this.applicationsService.getHistory(id);
+    return this.applicationsService.getHistory(
+      id,
+      currentUser,
+    );
   }
 
   @Delete(":id")
+  @Roles("candidate")
   @ApiOperation({
-    summary: "Ứng viên rút hồ sơ ứng tuyển",
+    summary: "Ứng viên rút hồ sơ của mình",
   })
   @ApiParam({
     name: "id",
@@ -189,15 +224,24 @@ export class ApplicationsController {
   })
   @ApiBadRequestResponse({
     description:
-      "id không hợp lệ hoặc hồ sơ không còn ở trạng thái mới",
+      "Hồ sơ không còn ở trạng thái new",
+  })
+  @ApiUnauthorizedResponse({
+    description: "Chưa đăng nhập",
+  })
+  @ApiForbiddenResponse({
+    description: "Hồ sơ không thuộc ứng viên",
   })
   @ApiNotFoundResponse({
-    description: "Không tìm thấy hồ sơ ứng tuyển",
+    description: "Không tìm thấy hồ sơ",
   })
   remove(
-    @Param("id", ParseIntPipe)
-    id: number,
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser("id") candidateId: number,
   ) {
-    return this.applicationsService.remove(id);
+    return this.applicationsService.remove(
+      id,
+      candidateId,
+    );
   }
 }
