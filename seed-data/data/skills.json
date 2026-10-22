@@ -1,0 +1,329 @@
+[
+  {
+    "name": ".NET",
+    "aliases": [
+      "dotnet",
+      ".NET Core"
+    ]
+  },
+  {
+    "name": "AWS",
+    "aliases": []
+  },
+  {
+    "name": "Adobe XD",
+    "aliases": []
+  },
+  {
+    "name": "Agile/Scrum",
+    "aliases": [
+      "Scrum",
+      "Agile"
+    ]
+  },
+  {
+    "name": "Airflow",
+    "aliases": []
+  },
+  {
+    "name": "Android",
+    "aliases": []
+  },
+  {
+    "name": "C#",
+    "aliases": []
+  },
+  {
+    "name": "CI/CD",
+    "aliases": [
+      "CI CD"
+    ]
+  },
+  {
+    "name": "Cypress",
+    "aliases": []
+  },
+  {
+    "name": "Dart",
+    "aliases": []
+  },
+  {
+    "name": "Design System",
+    "aliases": []
+  },
+  {
+    "name": "Django",
+    "aliases": []
+  },
+  {
+    "name": "Docker",
+    "aliases": []
+  },
+  {
+    "name": "ETL",
+    "aliases": []
+  },
+  {
+    "name": "Elasticsearch",
+    "aliases": []
+  },
+  {
+    "name": "Excel",
+    "aliases": []
+  },
+  {
+    "name": "FastAPI",
+    "aliases": []
+  },
+  {
+    "name": "Figma",
+    "aliases": []
+  },
+  {
+    "name": "Firebase",
+    "aliases": []
+  },
+  {
+    "name": "Flutter",
+    "aliases": []
+  },
+  {
+    "name": "Git",
+    "aliases": []
+  },
+  {
+    "name": "GitHub Actions",
+    "aliases": [
+      "GH Actions"
+    ]
+  },
+  {
+    "name": "GraphQL",
+    "aliases": []
+  },
+  {
+    "name": "HTML/CSS",
+    "aliases": [
+      "HTML5/CSS3"
+    ]
+  },
+  {
+    "name": "JMeter",
+    "aliases": []
+  },
+  {
+    "name": "Java",
+    "aliases": []
+  },
+  {
+    "name": "JavaScript",
+    "aliases": [
+      "JS"
+    ]
+  },
+  {
+    "name": "Jenkins",
+    "aliases": []
+  },
+  {
+    "name": "Jest",
+    "aliases": []
+  },
+  {
+    "name": "Jira",
+    "aliases": []
+  },
+  {
+    "name": "Kafka",
+    "aliases": []
+  },
+  {
+    "name": "Kotlin",
+    "aliases": []
+  },
+  {
+    "name": "Kubernetes",
+    "aliases": [
+      "k8s"
+    ]
+  },
+  {
+    "name": "Linux",
+    "aliases": []
+  },
+  {
+    "name": "Machine Learning",
+    "aliases": [
+      "ML"
+    ]
+  },
+  {
+    "name": "Microservices",
+    "aliases": []
+  },
+  {
+    "name": "MongoDB",
+    "aliases": [
+      "Mongo"
+    ]
+  },
+  {
+    "name": "MySQL",
+    "aliases": []
+  },
+  {
+    "name": "NLP",
+    "aliases": []
+  },
+  {
+    "name": "NestJS",
+    "aliases": [
+      "Nest.js"
+    ]
+  },
+  {
+    "name": "Next.js",
+    "aliases": [
+      "NextJS"
+    ]
+  },
+  {
+    "name": "Node.js",
+    "aliases": [
+      "NodeJS",
+      "Node"
+    ]
+  },
+  {
+    "name": "Pandas",
+    "aliases": []
+  },
+  {
+    "name": "Playwright",
+    "aliases": []
+  },
+  {
+    "name": "PostgreSQL",
+    "aliases": [
+      "Postgres"
+    ]
+  },
+  {
+    "name": "Postman",
+    "aliases": []
+  },
+  {
+    "name": "Power BI",
+    "aliases": [
+      "PowerBI"
+    ]
+  },
+  {
+    "name": "PyTorch",
+    "aliases": []
+  },
+  {
+    "name": "Python",
+    "aliases": []
+  },
+  {
+    "name": "REST API",
+    "aliases": [
+      "RESTful API"
+    ]
+  },
+  {
+    "name": "RabbitMQ",
+    "aliases": []
+  },
+  {
+    "name": "React",
+    "aliases": [
+      "ReactJS",
+      "React.js"
+    ]
+  },
+  {
+    "name": "Redis",
+    "aliases": []
+  },
+  {
+    "name": "SQL",
+    "aliases": []
+  },
+  {
+    "name": "SQL Server",
+    "aliases": []
+  },
+  {
+    "name": "Selenium",
+    "aliases": []
+  },
+  {
+    "name": "Spark",
+    "aliases": []
+  },
+  {
+    "name": "Spring Boot",
+    "aliases": [
+      "Spring"
+    ]
+  },
+  {
+    "name": "Tableau",
+    "aliases": []
+  },
+  {
+    "name": "Tailwind CSS",
+    "aliases": [
+      "Tailwind"
+    ]
+  },
+  {
+    "name": "Terraform",
+    "aliases": []
+  },
+  {
+    "name": "Test case",
+    "aliases": [
+      "Testcase"
+    ]
+  },
+  {
+    "name": "TypeScript",
+    "aliases": [
+      "TS"
+    ]
+  },
+  {
+    "name": "UML",
+    "aliases": []
+  },
+  {
+    "name": "Unit test",
+    "aliases": [
+      "Unit Testing"
+    ]
+  },
+  {
+    "name": "User Story",
+    "aliases": [
+      "user stories"
+    ]
+  },
+  {
+    "name": "Vue.js",
+    "aliases": [
+      "VueJS",
+      "Vue"
+    ]
+  },
+  {
+    "name": "Wireframe",
+    "aliases": []
+  },
+  {
+    "name": "scikit-learn",
+    "aliases": []
+  }
+]

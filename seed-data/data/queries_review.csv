@@ -1,0 +1,31 @@
+﻿qid,query,group,split,so_tin_diem_2,so_tin_diem_1,tieu_chi,kiem_tra_tay (dung/sai)
+Q01,NestJS backend,keyword,tune,28,58,Điểm 2: vị trí backend NestJS. Điểm 1: vị trí backend khác.,dung
+Q02,React frontend Hà Nội,keyword,tune,9,15,Điểm 2: frontend React tại Hà Nội. Điểm 1: frontend React ở nơi khác.,dung
+Q03,DevOps Docker Kubernetes,keyword,test,10,11,Điểm 2: DevOps có Kubernetes. Điểm 1: DevOps khác.,dung
+Q04,Java Spring Boot senior,keyword,tune,5,19,Điểm 2: Java Spring Boot cấp senior. Điểm 1: Java Spring Boot cấp khác.,dung
+Q05,tester automation Selenium,keyword,test,11,12,Điểm 2: kiểm thử có Selenium. Điểm 1: kiểm thử khác.,dung
+Q06,Data Analyst SQL Power BI,keyword,tune,8,7,Điểm 2: phân tích dữ liệu có Power BI. Điểm 1: phân tích dữ liệu khác.,dung
+Q07,Flutter Developer TP. Hồ Chí Minh,keyword,tune,9,9,Điểm 2: Flutter tại TP. Hồ Chí Minh. Điểm 1: Flutter ở nơi khác.,dung
+Q08,Python FastAPI backend,keyword,tune,11,6,Điểm 2: backend Python dùng FastAPI. Điểm 1: backend Python khác.,dung
+Q09,UI/UX Designer Figma,keyword,tune,14,0,Điểm 2: thiết kế UI/UX.,dung
+Q10,.NET C# developer,keyword,test,17,0,Điểm 2: lập trình .NET.,dung
+Q11,việc làm cho người mới ra trường muốn làm lập trình phía máy chủ,semantic,tune,39,47,Điểm 2: backend cấp intern hoặc junior. Điểm 1: backend cấp khác.,dung
+Q12,làm ứng dụng trên điện thoại di động cho người mới bắt đầu,semantic,tune,14,18,Điểm 2: mobile cấp intern hoặc junior. Điểm 1: mobile cấp khác.,dung
+Q13,xây dựng giao diện website cho người dùng cuối,semantic,tune,38,15,Điểm 2: frontend. Điểm 1: fullstack.,dung
+Q14,xử lý và vận chuyển khối lượng dữ liệu lớn giữa các hệ thống,semantic,test,16,27,Điểm 2: kỹ sư dữ liệu. Điểm 1: nhóm dữ liệu khác.,dung
+Q15,kiểm tra chất lượng phần mềm trước khi phát hành,semantic,tune,23,0,Điểm 2: kiểm thử.,dung
+Q16,"triển khai và giữ cho hệ thống hoạt động ổn định, tự động hóa quy trình phát hành",semantic,tune,21,0,Điểm 2: DevOps.,dung
+Q17,"làm cầu nối giữa khách hàng và đội phát triển, phân tích yêu cầu",semantic,test,13,0,Điểm 2: phân tích nghiệp vụ.,dung
+Q18,thiết kế trải nghiệm và giao diện sản phẩm,semantic,tune,14,38,Điểm 2: thiết kế UI/UX. Điểm 1: frontend.,dung
+Q19,huấn luyện mô hình trí tuệ nhân tạo,semantic,tune,12,0,Điểm 2: kỹ sư học máy.,dung
+Q20,"công việc làm từ xa, không phải đến công ty",semantic,tune,19,16,Điểm 2: remote hoàn toàn. Điểm 1: hybrid.,dung
+Q21,việc công nghệ cho ngân hàng và dịch vụ thanh toán,semantic,test,44,0,Điểm 2: công ty fintech và tin có nêu lĩnh vực.,dung
+Q22,"vị trí dành cho người nhiều năm kinh nghiệm, có thể dẫn dắt đội nhóm",semantic,test,57,0,Điểm 2: cấp senior.,dung
+Q23,lap trinh vien backend ha noi,no_diacritics,test,22,64,Điểm 2: backend tại Hà Nội. Điểm 1: backend ở nơi khác.,dung
+Q24,tuyen tester hcm,no_diacritics,tune,9,14,Điểm 2: kiểm thử tại TP. Hồ Chí Minh. Điểm 1: kiểm thử ở nơi khác.,dung
+Q25,fe react junior hcm,no_diacritics,tune,8,16,Điểm 2: frontend React cấp junior. Điểm 1: frontend React cấp khác.,dung
+Q26,dev flutter hcm,no_diacritics,tune,9,9,Điểm 2: Flutter tại TP. Hồ Chí Minh. Điểm 1: Flutter ở nơi khác.,dung
+Q27,be java sr,no_diacritics,tune,5,19,Điểm 2: Java cấp senior. Điểm 1: Java cấp khác.,dung
+Q28,devops hn,no_diacritics,test,3,18,Điểm 2: DevOps tại Hà Nội. Điểm 1: DevOps ở nơi khác.,dung
+Q29,phan tich du lieu sql power bi,no_diacritics,tune,8,7,Điểm 2: phân tích dữ liệu có Power BI. Điểm 1: phân tích dữ liệu khác.,dung
+Q30,thuc tap sinh frontend,no_diacritics,tune,5,33,Điểm 2: frontend cấp intern. Điểm 1: frontend cấp khác.,dung

@@ -1,0 +1,41 @@
+﻿pair_id,cv,cv_vi_tri_cap_do,job,job_title,label_auto,ly_do_tu_dong,label_human,split,nhan_cu_truoc_khi_siet
+P01,R02,backend_nestjs / middle,J090,Backend Developer (NestJS),suitable,"compat=1.0, overlap=0.8, gap=-1, thieu_bat_buoc=-, thieu_uu_tien=Elasticsearch",suitable,tune,suitable
+P02,R16,qa / middle,J105,QA Tester,review,"compat=1.0, overlap=1.0, gap=-2, thieu_bat_buoc=-, thieu_uu_tien=-",suitable,tune,review
+P03,R10,fullstack / middle,J121,Frontend Engineer (React) (Middle),unsuitable,"compat=0.6, overlap=0.33, gap=0, thieu_bat_buoc=-, thieu_uu_tien=Next.js+Jest+GraphQL+HTML/CSS",unsuitable,tune,review
+P04,R13,data_engineer / middle,J152,Chuyên viên phân tích dữ liệu Lead,unsuitable,"compat=0.6, overlap=0.33, gap=1, thieu_bat_buoc=Excel+Power BI, thieu_uu_tien=Pandas+Git",unsuitable,tune,review
+P05,R09,frontend_vue / middle,J129,Frontend Engineer (React),unsuitable,"compat=0.6, overlap=0.6, gap=-1, thieu_bat_buoc=React, thieu_uu_tien=Tailwind CSS",unsuitable,tune,review
+P06,R04,backend_java / intern,J294,Backend Developer (NestJS) (Junior),unsuitable,"compat=0.6, overlap=0.0, gap=1, thieu_bat_buoc=NestJS+TypeScript+Node.js, thieu_uu_tien=RabbitMQ+Elasticsearch+PostgreSQL",unsuitable,tune,unsuitable
+P07,R05,backend_dotnet / middle,J004,Lập trình viên .NET (Middle),suitable,"compat=1.0, overlap=0.83, gap=0, thieu_bat_buoc=-, thieu_uu_tien=Redis",suitable,tune,suitable
+P08,R03,backend_java / senior,J199,Java Backend Developer,suitable,"compat=1.0, overlap=1.0, gap=-1, thieu_bat_buoc=-, thieu_uu_tien=-",suitable,tune,suitable
+P09,R18,ba / junior,J060,IT Business Analyst,review,"compat=1.0, overlap=0.8, gap=1, thieu_bat_buoc=-, thieu_uu_tien=Excel",review,tune,suitable
+P10,R10,fullstack / middle,J109,Lập trình viên Backend Python (Middle),unsuitable,"compat=0.6, overlap=0.2, gap=0, thieu_bat_buoc=Python+Django, thieu_uu_tien=Unit test+MongoDB",unsuitable,tune,review
+P11,R06,backend_python / junior,J180,Lập trình viên .NET,unsuitable,"compat=0.6, overlap=0.0, gap=1, thieu_bat_buoc=C#+.NET, thieu_uu_tien=Redis+RabbitMQ",unsuitable,tune,unsuitable
+P12,R09,frontend_vue / middle,J099,Frontend Engineer (React) Lead,unsuitable,"compat=0.6, overlap=0.5, gap=1, thieu_bat_buoc=React, thieu_uu_tien=Next.js+Jest",unsuitable,tune,review
+P13,R08,frontend_react / senior,J034,Frontend Developer (Vue) Lead,unsuitable,"compat=0.6, overlap=0.33, gap=0, thieu_bat_buoc=Vue.js+JavaScript, thieu_uu_tien=Tailwind CSS+HTML/CSS",unsuitable,tune,review
+P14,R13,data_engineer / middle,J076,Machine Learning Engineer,unsuitable,"compat=0.6, overlap=0.4, gap=-1, thieu_bat_buoc=Machine Learning, thieu_uu_tien=FastAPI+NLP",unsuitable,tune,review
+P15,R12,mobile_android / middle,J226,C# Backend Developer,unsuitable,"compat=0.0, overlap=0.0, gap=-2, thieu_bat_buoc=C#+.NET, thieu_uu_tien=Redis+RabbitMQ",unsuitable,tune,unsuitable
+P16,R11,mobile_flutter / junior,J153,Fresher Flutter Developer,suitable,"compat=1.0, overlap=0.75, gap=-1, thieu_bat_buoc=-, thieu_uu_tien=Unit test",suitable,tune,suitable
+P17,R14,data_analyst / junior,J026,C# Backend Developer Lead,unsuitable,"compat=0.0, overlap=0.0, gap=2, thieu_bat_buoc=C#+.NET, thieu_uu_tien=Docker+RabbitMQ+SQL Server",unsuitable,tune,unsuitable
+P18,R02,backend_nestjs / middle,J098,Junior Lập trình viên Java Spring Boot,unsuitable,"compat=0.6, overlap=0.2, gap=-1, thieu_bat_buoc=Java+Spring Boot, thieu_uu_tien=Kubernetes+Microservices",unsuitable,tune,review
+P19,R05,backend_dotnet / middle,J058,C# Backend Developer,review,"compat=1.0, overlap=0.67, gap=1, thieu_bat_buoc=-, thieu_uu_tien=Redis+Microservices",unsuitable,tune,suitable
+P20,R19,ui_ux / middle,J130,Lập trình viên Java Spring Boot (Middle),unsuitable,"compat=0.0, overlap=0.0, gap=0, thieu_bat_buoc=Java+Spring Boot, thieu_uu_tien=Docker+MySQL+REST API",unsuitable,tune,unsuitable
+P21,R01,backend_nestjs / junior,J241,Lập trình viên Frontend ReactJS,unsuitable,"compat=0.0, overlap=0.0, gap=0, thieu_bat_buoc=React+JavaScript, thieu_uu_tien=REST API+HTML/CSS+Jest",unsuitable,tune,unsuitable
+P22,R14,data_analyst / junior,J057,Data Analyst,review,"compat=1.0, overlap=0.8, gap=1, thieu_bat_buoc=-, thieu_uu_tien=Git",review,tune,suitable
+P23,R14,data_analyst / junior,J266,Kỹ sư dữ liệu,unsuitable,"compat=0.6, overlap=0.33, gap=2, thieu_bat_buoc=ETL, thieu_uu_tien=Airflow+Git+PostgreSQL",unsuitable,tune,unsuitable
+P24,R06,backend_python / junior,J154,Lập trình viên Backend Python,unsuitable,"compat=1.0, overlap=0.8, gap=2, thieu_bat_buoc=-, thieu_uu_tien=MongoDB",unsuitable,tune,unsuitable
+P25,R12,mobile_android / middle,J191,C# Backend Developer,unsuitable,"compat=0.0, overlap=0.4, gap=0, thieu_bat_buoc=C#+.NET, thieu_uu_tien=Docker",unsuitable,tune,unsuitable
+P26,R03,backend_java / senior,J254,Senior Fullstack Engineer,unsuitable,"compat=0.6, overlap=0.14, gap=0, thieu_bat_buoc=React+Node.js, thieu_uu_tien=NestJS+Git+Redis+MongoDB",unsuitable,test,unsuitable
+P27,R02,backend_nestjs / middle,J009,Lập trình viên Backend NestJS (Junior),review,"compat=1.0, overlap=0.67, gap=-1, thieu_bat_buoc=-, thieu_uu_tien=GraphQL+Jest",review,tune,suitable
+P28,R07,frontend_react / junior,J036,Frontend Engineer (React),review,"compat=1.0, overlap=0.67, gap=1, thieu_bat_buoc=-, thieu_uu_tien=GraphQL+Jest",review,tune,suitable
+P29,R06,backend_python / junior,J145,.NET Developer (Junior),unsuitable,"compat=0.6, overlap=0.0, gap=0, thieu_bat_buoc=C#+.NET, thieu_uu_tien=SQL Server+RabbitMQ",unsuitable,test,unsuitable
+P30,R01,backend_nestjs / junior,J222,Backend Developer (NestJS),review,"compat=1.0, overlap=0.6, gap=1, thieu_bat_buoc=-, thieu_uu_tien=Redis+Elasticsearch",review,test,suitable
+P31,R05,backend_dotnet / middle,J237,Junior Node.js Backend Engineer,unsuitable,"compat=0.6, overlap=0.2, gap=-1, thieu_bat_buoc=NestJS+TypeScript+Node.js, thieu_uu_tien=Microservices",unsuitable,tune,review
+P32,R07,frontend_react / junior,J096,React Frontend Developer (Junior),suitable,"compat=1.0, overlap=0.75, gap=0, thieu_bat_buoc=-, thieu_uu_tien=GraphQL",suitable,test,suitable
+P33,R01,backend_nestjs / junior,J158,Kỹ sư DevOps,unsuitable,"compat=0.0, overlap=0.4, gap=1, thieu_bat_buoc=Linux+CI/CD, thieu_uu_tien=AWS",unsuitable,test,unsuitable
+P34,R17,devops / middle,J164,DevOps Engineer,review,"compat=1.0, overlap=0.83, gap=1, thieu_bat_buoc=-, thieu_uu_tien=Redis",review,test,suitable
+P35,R03,backend_java / senior,J127,Thực tập sinh Node.js Backend Engineer,unsuitable,"compat=0.6, overlap=0.2, gap=-3, thieu_bat_buoc=NestJS+TypeScript+Node.js, thieu_uu_tien=Redis",unsuitable,test,review
+P36,R17,devops / middle,J015,Lập trình viên Android,unsuitable,"compat=0.0, overlap=0.2, gap=1, thieu_bat_buoc=Kotlin+Android, thieu_uu_tien=REST API+Unit test",unsuitable,test,unsuitable
+P37,R20,frontend_react / intern,J097,"Fullstack Developer (React, Node.js) (Junior)",unsuitable,"compat=0.6, overlap=0.4, gap=1, thieu_bat_buoc=Node.js, thieu_uu_tien=PostgreSQL+Docker",unsuitable,test,review
+P38,R07,frontend_react / junior,J069,Frontend Engineer (React) (Junior),suitable,"compat=1.0, overlap=0.8, gap=0, thieu_bat_buoc=-, thieu_uu_tien=REST API",suitable,test,suitable
+P39,R10,fullstack / middle,J042,React Frontend Developer,review,"compat=0.6, overlap=0.5, gap=0, thieu_bat_buoc=-, thieu_uu_tien=GraphQL+HTML/CSS",review,test,review
+P40,R09,frontend_vue / middle,J007,Senior Lập trình viên Frontend ReactJS,unsuitable,"compat=0.6, overlap=0.4, gap=1, thieu_bat_buoc=React, thieu_uu_tien=Jest+Next.js",unsuitable,test,review

@@ -79,6 +79,10 @@ RABBITMQ_URL=amqp://localhost:5673
 # Redis (Caching & Rate Limiting)
 REDIS_HOST=localhost
 REDIS_PORT=6381
+
+# TOKEN SECRET (Dùng làm khóa cho các token, tự tạo hoặc random)
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
 ```
 
 **Bước 3: Dựng hạ tầng với Docker**

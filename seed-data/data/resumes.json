@@ -1,0 +1,363 @@
+[
+  {
+    "ref": "R01",
+    "name": "Ứng viên mẫu 01",
+    "target_role": "backend_nestjs",
+    "level": "junior",
+    "years": 1,
+    "province": "Hà Nội",
+    "skills": [
+      "NestJS",
+      "TypeScript",
+      "Node.js",
+      "PostgreSQL",
+      "Docker",
+      "Git"
+    ],
+    "format": "messy",
+    "text": "Ứng viên mẫu 01 | Vị trí ứng tuyển: Lập trình viên Backend NestJS | Email: candidate01@example.com | Địa điểm: Hà Nội | Mục tiêu nghề nghiệp | Có 1 năm kinh nghiệm, mong muốn tiếp tục phát triển ở vị trí Lập trình viên Backend NestJS trong môi trường có người hướng dẫn. | Kỹ năng | NestJS, TypeScript, Node.js, PostgreSQL, Docker, Git | Kinh nghiệm làm việc | 2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Backend NestJS: thiết kế và phát triển REST API bằng NestJS cho các sản phẩm của công ty; theo dõi log, xử lý lỗi và giữ cho hệ thống chạy ổn định trên môi trường thật. | Dự án | Dự án đặt phòng khách sạn: theo dõi log, xử lý lỗi và giữ cho hệ thống chạy ổn định trên môi trường thật. Công nghệ: NestJS, Docker và Git. | Dự án website tin tức: xây dựng module, service và cơ chế phân quyền người dùng bằng guard và interceptor. Công nghệ: Node.js, Docker và Git. | Học vấn | Đại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2024."
+  },
+  {
+    "ref": "R02",
+    "name": "Ứng viên mẫu 02",
+    "target_role": "backend_nestjs",
+    "level": "middle",
+    "years": 3,
+    "province": "Hà Nội",
+    "skills": [
+      "NestJS",
+      "TypeScript",
+      "Node.js",
+      "Redis",
+      "RabbitMQ",
+      "Docker",
+      "PostgreSQL",
+      "REST API"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 02\nVị trí ứng tuyển: Lập trình viên Backend NestJS\nEmail: candidate02@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Lập trình viên Backend NestJS, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nNestJS, TS, Node.js, Redis, RabbitMQ, Docker, Postgres, REST API\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Backend NestJS: viết unit test, e2e test và tham gia review code trong nhóm; thiết kế cơ sở dữ liệu, viết truy vấn và tối ưu hiệu năng cho các API có nhiều người dùng.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Backend NestJS: viết unit test, e2e test và tham gia review code trong nhóm; xây dựng module, service và cơ chế phân quyền người dùng bằng guard và interceptor.\n\nDự án\nDự án website tin tức: phối hợp với frontend và tester để hoàn thiện tính năng đúng tiến độ. Công nghệ: NestJS, REST API và Node.js.\nDự án đặt phòng khách sạn: thiết kế cơ sở dữ liệu, viết truy vấn và tối ưu hiệu năng cho các API có nhiều người dùng. Công nghệ: REST API, TS và Redis.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R03",
+    "name": "Ứng viên mẫu 03",
+    "target_role": "backend_java",
+    "level": "senior",
+    "years": 6,
+    "province": "Hà Nội",
+    "skills": [
+      "Java",
+      "Spring Boot",
+      "MySQL",
+      "Kafka",
+      "Docker",
+      "Kubernetes",
+      "Microservices",
+      "REST API"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 03\nVị trí ứng tuyển: Lập trình viên Java Spring Boot\nEmail: candidate03@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nHơn 6 năm kinh nghiệm, từng dẫn dắt nhóm nhỏ, mong muốn đóng góp vào thiết kế kiến trúc và định hướng kỹ thuật.\n\nKỹ năng\nJava, Spring Boot, MySQL, Kafka, Docker, Kubernetes, Microservices, REST API\n\nKinh nghiệm làm việc\n2024 - 2026 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Java Spring Boot: viết tài liệu kỹ thuật và test tự động cho các module phụ trách; phát triển các dịch vụ backend bằng Java và Spring Boot.\n2022 - 2024 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Java Spring Boot: tham gia thiết kế kiến trúc microservices, đảm bảo khả năng mở rộng; viết tài liệu kỹ thuật và test tự động cho các module phụ trách.\n2020 - 2022 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Java Spring Boot: thiết kế API và tích hợp với hệ thống của đối tác; phát triển các dịch vụ backend bằng Java và Spring Boot.\n\nDự án\nDự án đặt lịch khám bệnh: tối ưu truy vấn và xử lý giao dịch với khối lượng dữ liệu lớn. Công nghệ: MySQL, REST API và Docker.\nDự án ứng dụng học từ vựng: tham gia thiết kế kiến trúc microservices, đảm bảo khả năng mở rộng. Công nghệ: Java, Kubernetes và MySQL.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2019."
+  },
+  {
+    "ref": "R04",
+    "name": "Ứng viên mẫu 04",
+    "target_role": "backend_java",
+    "level": "intern",
+    "years": 0,
+    "province": "Hà Nội",
+    "skills": [
+      "Java",
+      "Spring Boot",
+      "MySQL",
+      "Git"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 04\nVị trí ứng tuyển: Lập trình viên Java Spring Boot\nEmail: candidate04@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nSinh viên năm cuối ngành Công nghệ thông tin, mong muốn thực tập ở vị trí Lập trình viên Java Spring Boot để áp dụng kiến thức vào dự án thực tế.\n\nKỹ năng\nJava, Spring, MySQL, Git\n\nKinh nghiệm làm việc\nChưa có kinh nghiệm đi làm chính thức.\n\nDự án\nDự án quản lý nhà trọ: hỗ trợ xử lý sự cố trên môi trường vận hành. Công nghệ: Java, Git và Spring.\nDự án website tin tức: thiết kế API và tích hợp với hệ thống của đối tác. Công nghệ: Git, Spring và MySQL.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, dự kiến tốt nghiệp năm 2027."
+  },
+  {
+    "ref": "R05",
+    "name": "Ứng viên mẫu 05",
+    "target_role": "backend_dotnet",
+    "level": "middle",
+    "years": 3,
+    "province": "Hà Nội",
+    "skills": [
+      "C#",
+      ".NET",
+      "SQL Server",
+      "Docker",
+      "REST API",
+      "Git"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 05\nVị trí ứng tuyển: Lập trình viên .NET\nEmail: candidate05@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Lập trình viên .NET, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nC#, .NET, SQL Server, Docker, REST API, Git\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên .NET: triển khai ứng dụng lên máy chủ và hỗ trợ khách hàng khi có sự cố; viết unit test và sửa lỗi do tester báo.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên .NET: viết unit test và sửa lỗi do tester báo; tham gia họp phân tích yêu cầu và ước lượng thời gian thực hiện.\n\nDự án\nDự án đặt lịch khám bệnh: xây dựng các chức năng nghiệp vụ theo tài liệu yêu cầu của khách hàng. Công nghệ: REST API, C# và Git.\nDự án quản lý nhà trọ: phát triển và bảo trì ứng dụng web API bằng C# và .NET. Công nghệ: Docker, SQL Server và REST API.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R06",
+    "name": "Ứng viên mẫu 06",
+    "target_role": "backend_python",
+    "level": "junior",
+    "years": 1,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "Docker",
+      "Git",
+      "REST API"
+    ],
+    "format": "english",
+    "text": "Ứng viên mẫu 06\nTarget role: Python Developer\nLocation: TP. Hồ Chí Minh\n\nSkills\nPython, FastAPI, PostgreSQL, Docker, Git, REST API\n\nExperience\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Backend Python: viết script tự động hóa tác vụ lặp lại và xử lý dữ liệu đầu vào; trao đổi với nhóm frontend để thống nhất định dạng dữ liệu trả về.\n\nProjects\nDự án quản lý nhà trọ: viết test và tài liệu cho các endpoint đã xây dựng. Công nghệ: RESTful API, FastAPI và Docker.\nDự án quản lý thư viện: thiết kế mô hình dữ liệu và viết truy vấn cho các chức năng của hệ thống. Công nghệ: RESTful API, Docker và Python.\n\nEducation\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2024."
+  },
+  {
+    "ref": "R07",
+    "name": "Ứng viên mẫu 07",
+    "target_role": "frontend_react",
+    "level": "junior",
+    "years": 1,
+    "province": "Cần Thơ",
+    "skills": [
+      "React",
+      "TypeScript",
+      "JavaScript",
+      "HTML/CSS",
+      "Tailwind CSS",
+      "Git"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 07\nVị trí ứng tuyển: Lập trình viên Frontend ReactJS\nEmail: candidate07@example.com | Địa điểm: Cần Thơ\n\nMục tiêu nghề nghiệp\nCó 1 năm kinh nghiệm, mong muốn tiếp tục phát triển ở vị trí Lập trình viên Frontend ReactJS trong môi trường có người hướng dẫn.\n\nKỹ năng\nReact, TS, JavaScript, HTML/CSS, Tailwind CSS, Git\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Frontend ReactJS: sửa lỗi hiển thị trên các trình duyệt khác nhau; kết nối giao diện với API backend và xử lý trạng thái ứng dụng.\n\nDự án\nDự án đặt phòng khách sạn: xây dựng giao diện web bằng React theo bản thiết kế của nhóm UI/UX. Công nghệ: Tailwind CSS, JavaScript và React.\nDự án quản lý nhà trọ: xây dựng giao diện web bằng React theo bản thiết kế của nhóm UI/UX. Công nghệ: React, Git và HTML/CSS.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2024."
+  },
+  {
+    "ref": "R08",
+    "name": "Ứng viên mẫu 08",
+    "target_role": "frontend_react",
+    "level": "senior",
+    "years": 5,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "React",
+      "TypeScript",
+      "Next.js",
+      "Jest",
+      "REST API",
+      "GraphQL",
+      "Git"
+    ],
+    "format": "messy",
+    "text": "Ứng viên mẫu 08 | Vị trí ứng tuyển: Lập trình viên Frontend ReactJS | Email: candidate08@example.com | Địa điểm: TP. Hồ Chí Minh | Mục tiêu nghề nghiệp | Hơn 5 năm kinh nghiệm, từng dẫn dắt nhóm nhỏ, mong muốn đóng góp vào thiết kế kiến trúc và định hướng kỹ thuật. | Kỹ năng | React, TypeScript, NextJS, Jest, REST API, GraphQL, Git | Kinh nghiệm làm việc | 2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Frontend ReactJS: phối hợp với backend để thống nhất hợp đồng API; viết component dùng lại được và test giao diện. | 2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Frontend ReactJS: viết component dùng lại được và test giao diện; xây dựng giao diện web bằng React theo bản thiết kế của nhóm UI/UX. | 2021 - 2023 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Frontend ReactJS: xây dựng giao diện web bằng React theo bản thiết kế của nhóm UI/UX; phối hợp với backend để thống nhất hợp đồng API. | Dự án | Dự án theo dõi chi tiêu cá nhân: kết nối giao diện với API backend và xử lý trạng thái ứng dụng. Công nghệ: React, NextJS và Git. | Dự án ứng dụng học từ vựng: kết nối giao diện với API backend và xử lý trạng thái ứng dụng. Công nghệ: Jest, TypeScript và GraphQL. | Học vấn | Đại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2020."
+  },
+  {
+    "ref": "R09",
+    "name": "Ứng viên mẫu 09",
+    "target_role": "frontend_vue",
+    "level": "middle",
+    "years": 3,
+    "province": "Hà Nội",
+    "skills": [
+      "Vue.js",
+      "JavaScript",
+      "HTML/CSS",
+      "REST API",
+      "Git",
+      "TypeScript"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 09\nVị trí ứng tuyển: Lập trình viên Frontend VueJS\nEmail: candidate09@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Lập trình viên Frontend VueJS, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nVue.js, JavaScript, HTML/CSS, RESTful API, Git, TypeScript\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Frontend VueJS: chuẩn hóa cấu trúc component và code style trong dự án; viết test và sửa lỗi trước mỗi đợt phát hành.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Frontend VueJS: chuẩn hóa cấu trúc component và code style trong dự án; tối ưu hiệu năng và khả năng hiển thị trên điện thoại.\n\nDự án\nDự án đặt phòng khách sạn: trao đổi với designer để hiện thực đúng thiết kế. Công nghệ: RESTful API, TypeScript và Vue.js.\nDự án theo dõi chi tiêu cá nhân: tích hợp API, xử lý form, bảng dữ liệu và biểu đồ. Công nghệ: TypeScript, RESTful API và HTML/CSS.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R10",
+    "name": "Ứng viên mẫu 10",
+    "target_role": "fullstack",
+    "level": "middle",
+    "years": 3,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "React",
+      "Node.js",
+      "NestJS",
+      "PostgreSQL",
+      "Docker",
+      "TypeScript",
+      "Git"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 10\nVị trí ứng tuyển: Lập trình viên Fullstack\nEmail: candidate10@example.com | Địa điểm: TP. Hồ Chí Minh\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Lập trình viên Fullstack, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nReact, Node.js, NestJS, PostgreSQL, Docker, TypeScript, Git\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Fullstack: phát triển tính năng từ giao diện đến API và cơ sở dữ liệu; triển khai ứng dụng bằng Docker và theo dõi lỗi sau khi phát hành.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Fullstack: xây dựng giao diện bằng React và dịch vụ phía máy chủ bằng Node.js; thiết kế bảng dữ liệu và viết truy vấn cho các chức năng mới.\n\nDự án\nDự án đặt phòng khách sạn: thiết kế bảng dữ liệu và viết truy vấn cho các chức năng mới. Công nghệ: React, Git và PostgreSQL.\nDự án theo dõi chi tiêu cá nhân: viết test và tham gia review code. Công nghệ: PostgreSQL, Node.js và TypeScript.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R11",
+    "name": "Ứng viên mẫu 11",
+    "target_role": "mobile_flutter",
+    "level": "junior",
+    "years": 1,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "Flutter",
+      "Dart",
+      "REST API",
+      "Git",
+      "Firebase"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 11\nVị trí ứng tuyển: Lập trình viên ứng dụng di động Flutter\nEmail: candidate11@example.com | Địa điểm: TP. Hồ Chí Minh\n\nMục tiêu nghề nghiệp\nCó 1 năm kinh nghiệm, mong muốn tiếp tục phát triển ở vị trí Lập trình viên ứng dụng di động Flutter trong môi trường có người hướng dẫn.\n\nKỹ năng\nFlutter, Dart, REST API, Git, Firebase\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên ứng dụng di động Flutter: đẩy ứng dụng lên App Store và Google Play, theo dõi lỗi sau phát hành; kết nối ứng dụng với API và xử lý lưu trữ dữ liệu trên thiết bị.\n\nDự án\nDự án quản lý nhà trọ: kết nối ứng dụng với API và xử lý lưu trữ dữ liệu trên thiết bị. Công nghệ: Git, Firebase và Dart.\nDự án ứng dụng học từ vựng: phát triển ứng dụng di động đa nền tảng bằng Flutter. Công nghệ: REST API, Git và Flutter.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2024."
+  },
+  {
+    "ref": "R12",
+    "name": "Ứng viên mẫu 12",
+    "target_role": "mobile_android",
+    "level": "middle",
+    "years": 3,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "Kotlin",
+      "Android",
+      "REST API",
+      "Git",
+      "Firebase",
+      "Unit test"
+    ],
+    "format": "english",
+    "text": "Ứng viên mẫu 12\nTarget role: Kotlin Android Engineer\nLocation: TP. Hồ Chí Minh\n\nSkills\nKotlin, Android, REST API, Git, Firebase, Unit test\n\nExperience\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Lập trình viên Android: phối hợp với backend và designer trong mỗi sprint; tối ưu hiệu năng, mức tiêu thụ pin và độ ổn định của ứng dụng. 2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Lập trình viên Android: tối ưu hiệu năng, mức tiêu thụ pin và độ ổn định của ứng dụng; phát triển ứng dụng Android bằng Kotlin.\n\nProjects\nDự án đặt lịch khám bệnh: phát triển ứng dụng Android bằng Kotlin. Công nghệ: Unit test, Git và Kotlin.\nDự án ứng dụng học từ vựng: tối ưu hiệu năng, mức tiêu thụ pin và độ ổn định của ứng dụng. Công nghệ: Git, REST API và Unit test.\n\nEducation\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R13",
+    "name": "Ứng viên mẫu 13",
+    "target_role": "data_engineer",
+    "level": "middle",
+    "years": 3,
+    "province": "Cần Thơ",
+    "skills": [
+      "Python",
+      "SQL",
+      "ETL",
+      "Airflow",
+      "Spark",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 13\nVị trí ứng tuyển: Kỹ sư dữ liệu\nEmail: candidate13@example.com | Địa điểm: Cần Thơ\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Kỹ sư dữ liệu, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nPython, SQL, ETL, Airflow, Spark, PostgreSQL, Docker\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Kỹ sư dữ liệu: phối hợp với nhóm phân tích để cung cấp dữ liệu sạch, đúng hạn; thiết kế mô hình dữ liệu và tối ưu truy vấn trên khối lượng dữ liệu lớn.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Kỹ sư dữ liệu: viết job xử lý dữ liệu theo lô và theo thời gian thực; thiết kế mô hình dữ liệu và tối ưu truy vấn trên khối lượng dữ liệu lớn.\n\nDự án\nDự án ứng dụng học từ vựng: giám sát chất lượng dữ liệu và cảnh báo khi luồng dữ liệu bị lỗi. Công nghệ: SQL, PostgreSQL và ETL.\nDự án quản lý bán hàng: xây dựng và vận hành các luồng ETL đưa dữ liệu từ nhiều nguồn về kho dữ liệu. Công nghệ: SQL, Spark và PostgreSQL.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R14",
+    "name": "Ứng viên mẫu 14",
+    "target_role": "data_analyst",
+    "level": "junior",
+    "years": 1,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "SQL",
+      "Excel",
+      "Power BI",
+      "Python",
+      "Pandas"
+    ],
+    "format": "messy",
+    "text": "Ứng viên mẫu 14 | Vị trí ứng tuyển: Chuyên viên phân tích dữ liệu | Email: candidate14@example.com | Địa điểm: TP. Hồ Chí Minh | Mục tiêu nghề nghiệp | Có 1 năm kinh nghiệm, mong muốn tiếp tục phát triển ở vị trí Chuyên viên phân tích dữ liệu trong môi trường có người hướng dẫn. | Kỹ năng | SQL, Excel, Power BI, Python, Pandas | Kinh nghiệm làm việc | 2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Chuyên viên phân tích dữ liệu: thu thập, làm sạch và phân tích dữ liệu bán hàng và vận hành; xây dựng báo cáo và dashboard cho các phòng ban. | Dự án | Dự án quản lý thư viện: thu thập, làm sạch và phân tích dữ liệu bán hàng và vận hành. Công nghệ: SQL, Python và Power BI. | Dự án ứng dụng học từ vựng: trình bày kết quả phân tích cho quản lý. Công nghệ: Python, Pandas và Power BI. | Học vấn | Đại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2024."
+  },
+  {
+    "ref": "R15",
+    "name": "Ứng viên mẫu 15",
+    "target_role": "ml_engineer",
+    "level": "middle",
+    "years": 2,
+    "province": "Đà Nẵng",
+    "skills": [
+      "Python",
+      "Machine Learning",
+      "PyTorch",
+      "scikit-learn",
+      "NLP",
+      "Docker",
+      "Pandas"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 15\nVị trí ứng tuyển: Kỹ sư học máy\nEmail: candidate15@example.com | Địa điểm: Đà Nẵng\n\nMục tiêu nghề nghiệp\nCó 2 năm kinh nghiệm ở vị trí Kỹ sư học máy, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nPython, ML, PyTorch, scikit-learn, NLP, Docker, Pandas\n\nKinh nghiệm làm việc\n2024 - 2026 (2 năm), công ty (đã ẩn tên), vị trí Kỹ sư học máy: đưa mô hình vào hệ thống thật qua API và theo dõi chất lượng sau triển khai; thử nghiệm các mô hình ngôn ngữ và tìm kiếm theo ngữ nghĩa.\n\nDự án\nDự án quản lý bán hàng: viết báo cáo thử nghiệm và so sánh các phương án. Công nghệ: PyTorch, NLP và scikit-learn.\nDự án theo dõi chi tiêu cá nhân: thử nghiệm các mô hình ngôn ngữ và tìm kiếm theo ngữ nghĩa. Công nghệ: NLP, Python và scikit-learn.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2023."
+  },
+  {
+    "ref": "R16",
+    "name": "Ứng viên mẫu 16",
+    "target_role": "qa",
+    "level": "middle",
+    "years": 3,
+    "province": "Hà Nội",
+    "skills": [
+      "Test case",
+      "Postman",
+      "Selenium",
+      "JMeter",
+      "Jira",
+      "SQL"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 16\nVị trí ứng tuyển: Kiểm thử phần mềm\nEmail: candidate16@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Kiểm thử phần mềm, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nTest case, Postman, Selenium, JMeter, Jira, SQL\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Kiểm thử phần mềm: báo lỗi rõ ràng trên Jira và theo dõi đến khi lỗi được sửa; đọc yêu cầu, viết test case và thực hiện kiểm thử chức năng cho sản phẩm.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Kiểm thử phần mềm: kiểm thử API bằng Postman và kiểm thử hồi quy trước mỗi đợt phát hành; đọc yêu cầu, viết test case và thực hiện kiểm thử chức năng cho sản phẩm.\n\nDự án\nDự án đặt phòng khách sạn: phối hợp với lập trình viên để tái hiện và xác nhận lỗi. Công nghệ: Selenium, SQL và Test case.\nDự án quản lý nhà trọ: đọc yêu cầu, viết test case và thực hiện kiểm thử chức năng cho sản phẩm. Công nghệ: SQL, Selenium và JMeter.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R17",
+    "name": "Ứng viên mẫu 17",
+    "target_role": "devops",
+    "level": "middle",
+    "years": 4,
+    "province": "TP. Hồ Chí Minh",
+    "skills": [
+      "Docker",
+      "Linux",
+      "CI/CD",
+      "Kubernetes",
+      "GitHub Actions",
+      "AWS",
+      "Terraform"
+    ],
+    "format": "english",
+    "text": "Ứng viên mẫu 17\nTarget role: DevOps Engineer\nLocation: TP. Hồ Chí Minh\n\nSkills\nDocker, Linux, CI/CD, Kubernetes, GitHub Actions, AWS, Terraform\n\nExperience\n2024 - 2026 (2 năm), công ty (đã ẩn tên), vị trí Kỹ sư DevOps: xử lý sự cố trên môi trường vận hành và viết quy trình khắc phục; thiết lập giám sát, ghi log và cảnh báo để phát hiện sự cố sớm. 2022 - 2024 (2 năm), công ty (đã ẩn tên), vị trí Kỹ sư DevOps: hỗ trợ nhóm phát triển về môi trường và bảo mật cơ bản; xử lý sự cố trên môi trường vận hành và viết quy trình khắc phục.\n\nProjects\nDự án quản lý thư viện: đóng gói ứng dụng bằng Docker và quản lý môi trường chạy. Công nghệ: AWS, Terraform và Linux.\nDự án ứng dụng học từ vựng: đóng gói ứng dụng bằng Docker và quản lý môi trường chạy. Công nghệ: Docker, GH Actions và Kubernetes.\n\nEducation\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2021."
+  },
+  {
+    "ref": "R18",
+    "name": "Ứng viên mẫu 18",
+    "target_role": "ba",
+    "level": "junior",
+    "years": 1,
+    "province": "Hà Nội",
+    "skills": [
+      "UML",
+      "User Story",
+      "Jira",
+      "Agile/Scrum",
+      "SQL"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 18\nVị trí ứng tuyển: Chuyên viên phân tích nghiệp vụ\nEmail: candidate18@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nCó 1 năm kinh nghiệm, mong muốn tiếp tục phát triển ở vị trí Chuyên viên phân tích nghiệp vụ trong môi trường có người hướng dẫn.\n\nKỹ năng\nUML, User Story, Jira, Agile/Scrum, SQL\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Chuyên viên phân tích nghiệp vụ: tham gia kiểm tra sản phẩm trước khi bàn giao; làm việc với khách hàng và các bên liên quan để thu thập và làm rõ yêu cầu.\n\nDự án\nDự án website tin tức: vẽ sơ đồ luồng nghiệp vụ và mô hình dữ liệu ở mức khái quát. Công nghệ: UML, Agile/Scrum và Jira.\nDự án đặt phòng khách sạn: làm việc với khách hàng và các bên liên quan để thu thập và làm rõ yêu cầu. Công nghệ: Jira, User Story và Agile/Scrum.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2024."
+  },
+  {
+    "ref": "R19",
+    "name": "Ứng viên mẫu 19",
+    "target_role": "ui_ux",
+    "level": "middle",
+    "years": 3,
+    "province": "Hà Nội",
+    "skills": [
+      "Figma",
+      "Wireframe",
+      "Design System",
+      "Adobe XD",
+      "HTML/CSS"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 19\nVị trí ứng tuyển: Chuyên viên thiết kế UI/UX\nEmail: candidate19@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nCó 3 năm kinh nghiệm ở vị trí Chuyên viên thiết kế UI/UX, muốn đảm nhận phần việc lớn hơn và học thêm công nghệ mới.\n\nKỹ năng\nFigma, Wireframe, Design System, Adobe XD, HTML/CSS\n\nKinh nghiệm làm việc\n2025 - 2026 (1 năm), công ty (đã ẩn tên), vị trí Chuyên viên thiết kế UI/UX: thu thập phản hồi từ người dùng để cải thiện giao diện; xây dựng và duy trì design system dùng chung cho các sản phẩm.\n2023 - 2025 (2 năm), công ty (đã ẩn tên), vị trí Chuyên viên thiết kế UI/UX: phối hợp với lập trình viên để bàn giao thiết kế và kiểm tra kết quả; nghiên cứu người dùng và đề xuất luồng trải nghiệm cho sản phẩm.\n\nDự án\nDự án quản lý bán hàng: xây dựng và duy trì design system dùng chung cho các sản phẩm. Công nghệ: Design System, HTML/CSS và Wireframe.\nDự án quản lý nhà trọ: thu thập phản hồi từ người dùng để cải thiện giao diện. Công nghệ: Adobe XD, Wireframe và Design System.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, tốt nghiệp năm 2022."
+  },
+  {
+    "ref": "R20",
+    "name": "Ứng viên mẫu 20",
+    "target_role": "frontend_react",
+    "level": "intern",
+    "years": 0,
+    "province": "Hà Nội",
+    "skills": [
+      "HTML/CSS",
+      "JavaScript",
+      "React",
+      "Git"
+    ],
+    "format": "standard",
+    "text": "Ứng viên mẫu 20\nVị trí ứng tuyển: Lập trình viên Frontend ReactJS\nEmail: candidate20@example.com | Địa điểm: Hà Nội\n\nMục tiêu nghề nghiệp\nSinh viên năm cuối ngành Công nghệ thông tin, mong muốn thực tập ở vị trí Lập trình viên Frontend ReactJS để áp dụng kiến thức vào dự án thực tế.\n\nKỹ năng\nHTML/CSS, JavaScript, ReactJS, Git\n\nKinh nghiệm làm việc\nChưa có kinh nghiệm đi làm chính thức.\n\nDự án\nDự án đặt lịch khám bệnh: kết nối giao diện với API backend và xử lý trạng thái ứng dụng. Công nghệ: JavaScript, HTML/CSS và ReactJS.\nDự án ứng dụng học từ vựng: viết component dùng lại được và test giao diện. Công nghệ: Git, JavaScript và ReactJS.\n\nHọc vấn\nĐại học (đã ẩn tên), ngành Công nghệ thông tin, dự kiến tốt nghiệp năm 2027."
+  }
+]
