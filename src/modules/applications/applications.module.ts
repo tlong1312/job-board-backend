@@ -4,6 +4,7 @@ import { ApplicationsService } from "./applications.service";
 import { ApplicationsController } from "./applications.controller";
 import { ApplicationEntity } from "./entities/application.entity";
 import { ApplicationStatusHistory } from "./entities/application-status-history.entity";
+import { CompaniesModule } from "../companies/companies.module";
 import { JobsModule } from "../jobs/jobs.module";
 
 @Module({
@@ -13,6 +14,7 @@ import { JobsModule } from "../jobs/jobs.module";
       ApplicationStatusHistory,
     ]),
     JobsModule,
+    CompaniesModule,
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

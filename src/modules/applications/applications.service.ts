@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ApplicationStatusHistory } from "./entities/application-status-history.entity";
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from "@nestjs/common";
+import { CompaniesService } from "../companies/companies.service";
 import { JwtUser } from  "commons/decorators/current-user.decorator";
 import {
   BadRequestException,
@@ -26,6 +27,8 @@ export class ApplicationsService {
     private readonly jobsService: JobsService,
 
     private readonly dataSource: DataSource,
+
+    private readonly companiesService: CompaniesService,
   ) {}
 
   async create(
@@ -108,19 +111,22 @@ export class ApplicationsService {
       });
     }
 
+    if (currentUser.role === "admin") {
+      return this.applicationsRepository.find({
+        where: jobId === undefined ? {} : { jobId },
+        order: { createdAt: "DESC" },
+      });
+    }
+
+    if (currentUser.role !== "employer") {
+      throw new ForBiddenException("Bạn không có quyền xem hồ sơ");
+    }
+
     if (!jobId) {
-      throw new BadRequestException(
-        "Nhà tuyển dụng phải cung cấp jobId",
-      );
+      throw new BadRequestException("Nhà tuyển dụng phải cung cấp jobId");
     }
 
-    const job = await this.jobsService.findOne(jobId);
-
-    if (job.createdBy !== currentUser.id) {
-      throw new ForBiddenException(
-        "Bạn không phải chủ tin tuyển dụng này",
-      );
-    }
+    await this.assertCompanyOwner(jobId, currentUser.id);
 
     return this.applicationsRepository.find({
       where: {
@@ -132,21 +138,25 @@ export class ApplicationsService {
     });
   }
 
-  async findOneForCandidate(
-    id: number,
-    candidateId: number,
-  ): Promise<ApplicationEntity> {
-    const application = await this.findOne(id);
-
-    if (
-      application.candidateId !== candidateId
-    ) {
-      throw new ForBiddenException(
-        "Bạn không có quyền xem hồ sơ này",
-      );
+  private async assertCompanyOwner(jobId: number, employerId: number): Promise<void> {
+    const job = await this.jobsService.findOne(jobId);
+    const company = await this.companiesService.findOne(job.companyId);
+    if (company.ownerId !== employerId) {
+      throw new ForBiddenException("Hồ sơ không ứng tuyển vào công ty của bạn");
     }
+  }
 
-    return application;
+  async findOneForViewer(id: number, currentUser: JwtUser): Promise<ApplicationEntity> {
+    const application = await this.findOne(id);
+    if (currentUser.role === "admin") return application;
+    if (currentUser.role === "candidate" && application.candidateId === currentUser.id) {
+      return application;
+    }
+    if (currentUser.role === "employer") {
+      await this.assertCompanyOwner(application.jobId, currentUser.id);
+      return application;
+    }
+    throw new ForBiddenException("Bạn không có quyền xem hồ sơ này");
   }
 
   async findOne(
@@ -235,30 +245,7 @@ export class ApplicationsService {
     id: number,
     currentUser: JwtUser,
   ): Promise<ApplicationStatusHistory[]> {
-    const application = await this.findOne(id);
-
-    if (currentUser.role === "candidate") {
-      if (
-        application.candidateId !==
-        currentUser.id
-      ) {
-        throw new ForBiddenException(
-          "Bạn không có quyền xem lịch sử hồ sơ này",
-        );
-      }
-    }
-
-    if (currentUser.role === "employer") {
-      const job = await this.jobsService.findOne(
-        application.jobId,
-      );
-
-      if (job.createdBy !== currentUser.id) {
-        throw new ForBiddenException(
-          "Bạn không phải chủ tin tuyển dụng này",
-        );
-      }
-    }
+    await this.findOneForViewer(id, currentUser);
 
     return this.historyRepository.find({
       where: {
