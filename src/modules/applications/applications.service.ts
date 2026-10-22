@@ -5,9 +5,15 @@ import { JobsService } from "../jobs/jobs.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ApplicationStatusHistory } from "./entities/application-status-history.entity";
 import { DataSource, Repository } from 'typeorm';
-import { UsersService } from "../users/users.service";
 import { Injectable } from "@nestjs/common";
-import { BadRequestException, ConflictException, NotFoundException } from "commons/error";
+import { CompaniesService } from "../companies/companies.service";
+import { JwtUser } from  "commons/decorators/current-user.decorator";
+import {
+  BadRequestException,
+  ConflictException,
+  ForBiddenException,
+  NotFoundException,
+} from "commons/error";
 
 @Injectable()
 export class ApplicationsService {
@@ -20,124 +26,174 @@ export class ApplicationsService {
 
     private readonly jobsService: JobsService,
 
-    private readonly usersService: UsersService,
-
     private readonly dataSource: DataSource,
+
+    private readonly companiesService: CompaniesService,
   ) {}
 
-async create(createApplicationDto: CreateApplicationDto) {
-  const job = await this.jobsService.findOne(
-    createApplicationDto.jobId,
-  );
-
-  // 2. Chỉ job đang open mới được nhận hồ sơ
-  if (job.status !== "open") {
-    throw new BadRequestException(
-      "Tin tuyển dụng đã đóng hoặc bị khoá, không nhận hồ sơ",
+  async create(
+    createApplicationDto: CreateApplicationDto,
+    candidateId: number,
+  ) {
+    const job = await this.jobsService.findOne(
+      createApplicationDto.jobId,
     );
-  }
-  if (job.deadline) {
-    const today = new Date();
 
-    const year = today.getFullYear();
-    const month = String(
-      today.getMonth() + 1,
-    ).padStart(2, "0");
-    const day = String(
-      today.getDate(),
-    ).padStart(2, "0");
-
-    const todayString = `${year}-${month}-${day}`;
-
-    if (job.deadline < todayString) {
+    if (job.status !== "open") {
       throw new BadRequestException(
-        "Tin đã hết hạn nộp hồ sơ",
+        "Tin tuyển dụng đã đóng hoặc bị khoá, không nhận hồ sơ",
       );
     }
-  }
-  const candidate = await this.usersService.findOne(
-    createApplicationDto.candidateId,
-  );
-  if (candidate.role !== "candidate") {
-    throw new BadRequestException(
-      "Chỉ ứng viên mới được nộp hồ sơ",
-    );
-  }
-  const existingApplication =
-    await this.applicationsRepository.findOne({
-      where: {
-        jobId: createApplicationDto.jobId,
-        candidateId:
-          createApplicationDto.candidateId,
-      },
-    });
 
-  if (existingApplication) {
-    throw new ConflictException(
-      "Ứng viên đã nộp hồ sơ cho tin này",
+    if (job.deadline) {
+      const today = new Date();
+
+      const year = today.getFullYear();
+      const month = String(
+        today.getMonth() + 1,
+      ).padStart(2, "0");
+      const day = String(
+        today.getDate(),
+      ).padStart(2, "0");
+
+      const todayString =
+        `${year}-${month}-${day}`;
+
+      if (job.deadline < todayString) {
+        throw new BadRequestException(
+          "Tin đã hết hạn nộp hồ sơ",
+        );
+      }
+    }
+
+    const existingApplication =
+      await this.applicationsRepository.findOne({
+        where: {
+          jobId: createApplicationDto.jobId,
+          candidateId,
+        },
+      });
+
+    if (existingApplication) {
+      throw new ConflictException(
+        "Ứng viên đã nộp hồ sơ cho tin này",
+      );
+    }
+
+    const application =
+      this.applicationsRepository.create({
+        jobId: createApplicationDto.jobId,
+        candidateId,
+        resumeId:
+          createApplicationDto.resumeId ?? null,
+        coverLetter:
+          createApplicationDto.coverLetter ?? null,
+        status: "new",
+      });
+
+    return this.applicationsRepository.save(
+      application,
     );
   }
-  const application =
-    this.applicationsRepository.create({
-      jobId: createApplicationDto.jobId,
-      candidateId:
-        createApplicationDto.candidateId,
-      resumeId:
-        createApplicationDto.resumeId ?? null,
-      coverLetter:
-        createApplicationDto.coverLetter ?? null,
-      status: "new",
-    });
-  // 8. Lưu database
-  return this.applicationsRepository.save(
-    application,
-  );
-}
 
   async findAll(
+    currentUser: JwtUser,
     jobId?: number,
-    candidateId?: number,
   ): Promise<ApplicationEntity[]> {
-    const where: {
-      jobId?: number;
-      candidateId?: number;
-    } = {};
-
-    if (jobId) {
-      where.jobId = jobId;
+    if (currentUser.role === "candidate") {
+      return this.applicationsRepository.find({
+        where: {
+          candidateId: currentUser.id,
+        },
+        order: {
+          createdAt: "DESC",
+        },
+      });
     }
 
-    if (candidateId) {
-      where.candidateId = candidateId;
+    if (currentUser.role === "admin") {
+      return this.applicationsRepository.find({
+        where: jobId === undefined ? {} : { jobId },
+        order: { createdAt: "DESC" },
+      });
     }
+
+    if (currentUser.role !== "employer") {
+      throw new ForBiddenException("Bạn không có quyền xem hồ sơ");
+    }
+
+    if (!jobId) {
+      throw new BadRequestException("Nhà tuyển dụng phải cung cấp jobId");
+    }
+
+    await this.assertCompanyOwner(jobId, currentUser.id);
 
     return this.applicationsRepository.find({
-      where,
+      where: {
+        jobId,
+      },
       order: {
         createdAt: "DESC",
       },
     });
   }
-  
-  async findOne(id: number): Promise<ApplicationEntity> {
-    const application = 
-    await this.applicationsRepository.findOne({ where: { id } });
+
+  private async assertCompanyOwner(jobId: number, employerId: number): Promise<void> {
+    const job = await this.jobsService.findOne(jobId);
+    const company = await this.companiesService.findOne(job.companyId);
+    if (company.ownerId !== employerId) {
+      throw new ForBiddenException("Hồ sơ không ứng tuyển vào công ty của bạn");
+    }
+  }
+
+  async findOneForViewer(id: number, currentUser: JwtUser): Promise<ApplicationEntity> {
+    const application = await this.findOne(id);
+    if (currentUser.role === "admin") return application;
+    if (currentUser.role === "candidate" && application.candidateId === currentUser.id) {
+      return application;
+    }
+    if (currentUser.role === "employer") {
+      await this.assertCompanyOwner(application.jobId, currentUser.id);
+      return application;
+    }
+    throw new ForBiddenException("Bạn không có quyền xem hồ sơ này");
+  }
+
+  async findOne(
+    id: number,
+  ): Promise<ApplicationEntity> {
+    const application =
+      await this.applicationsRepository.findOne({
+        where: { id },
+      });
+
     if (!application) {
       throw new NotFoundException(
-      `Không tìm thấy hồ sơ có id ${id}`,
-    );
+        `Không tìm thấy hồ sơ có id ${id}`,
+      );
     }
-    
+
     return application;
   }
 
   async changeStatus(
     id: number,
-    updateApplicationStatusDto: UpdateApplicationStatusDto,
+    dto: UpdateApplicationStatusDto,
+    employerId: number,
   ) {
     const application = await this.findOne(id);
 
-    if (application.status === updateApplicationStatusDto.status) {
+    const job = await this.jobsService.findOne(
+      application.jobId,
+    );
+
+    if (job.createdBy !== employerId) {
+      throw new ForBiddenException(
+        "Bạn không phải chủ tin tuyển dụng này",
+      );
+    }
+
+    if (application.status === dto.status) {
       throw new BadRequestException(
         "Hồ sơ đã ở trạng thái này",
       );
@@ -153,8 +209,7 @@ async create(createApplicationDto: CreateApplicationDto) {
       async (manager) => {
         const oldStatus = application.status;
 
-        application.status =
-          updateApplicationStatusDto.status;
+        application.status = dto.status;
 
         const updatedApplication =
           await manager.save(
@@ -167,12 +222,12 @@ async create(createApplicationDto: CreateApplicationDto) {
           {
             applicationId: application.id,
             fromStatus: oldStatus,
-            toStatus:
-              updateApplicationStatusDto.status,
-            changedBy:
-              updateApplicationStatusDto.changedBy,
-            note:
-              updateApplicationStatusDto.note ?? null,
+            toStatus: dto.status,
+
+            // ID lấy từ JWT
+            changedBy: employerId,
+
+            note: dto.note ?? null,
           },
         );
 
@@ -188,8 +243,9 @@ async create(createApplicationDto: CreateApplicationDto) {
 
   async getHistory(
     id: number,
+    currentUser: JwtUser,
   ): Promise<ApplicationStatusHistory[]> {
-    await this.findOne(id);
+    await this.findOneForViewer(id, currentUser);
 
     return this.historyRepository.find({
       where: {
@@ -201,8 +257,19 @@ async create(createApplicationDto: CreateApplicationDto) {
     });
   }
 
-  async remove(id: number) {
+  async remove(
+    id: number,
+    candidateId: number,
+  ) {
     const application = await this.findOne(id);
+
+    if (
+      application.candidateId !== candidateId
+    ) {
+      throw new ForBiddenException(
+        "Bạn không có quyền rút hồ sơ này",
+      );
+    }
 
     if (application.status !== "new") {
       throw new BadRequestException(
