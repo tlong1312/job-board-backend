@@ -9,9 +9,10 @@ import { ApplicationsModule } from "./modules/applications/applications.module";
 import { JobsModule } from "./modules/jobs/jobs.module";
 import { dbOptions, load } from "./config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { CompaniesModule } from './modules/companies/companies.module';
+import { CompaniesModule } from "./modules/companies/companies.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { MailModule } from "./modules/mail/mail.module";
+import { SkillsModule } from "./modules/skills/skills.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +34,7 @@ import { MailModule } from "./modules/mail/mail.module";
     ApplicationsModule,
     ResumesModule,
     CompaniesModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
