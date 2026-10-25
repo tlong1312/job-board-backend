@@ -133,7 +133,7 @@ export class ResumesController {
   }
 
   @Delete(':id')
-  @Public()
+  @Roles('candidate', 'admin')
   @ApiOperation({ summary: 'Xóa CV' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.resumesService.remove(id);
