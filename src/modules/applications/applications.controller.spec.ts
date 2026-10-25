@@ -21,7 +21,12 @@ describe('ApplicationsController', () => {
   });
 
   it.each(['findAll', 'findOne', 'getHistory'] as const)('requires authentication and viewer roles on %s', (method) => {
-    expect(Reflect.getMetadata(IS_PUBLIC_KEY, controller[method])).not.toBe(true);
-    expect(Reflect.getMetadata(ROLES_KEY, controller[method])).toEqual(['candidate', 'employer', 'admin']);
+    // Read the original handler for metadata inspection without invoking it.
+    const handler: unknown = Object.getOwnPropertyDescriptor(ApplicationsController.prototype, method)?.value;
+    if (typeof handler !== 'function') {
+      throw new Error(`Missing controller handler: ${method}`);
+    }
+    expect(Reflect.getMetadata(IS_PUBLIC_KEY, handler)).not.toBe(true);
+    expect(Reflect.getMetadata(ROLES_KEY, handler)).toEqual(['candidate', 'employer', 'admin']);
   });
 });
