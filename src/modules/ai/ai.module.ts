@@ -16,6 +16,14 @@ import { AiJobsProducer } from "./jobs/ai-jobs.producer";
 import { AiJobsService } from "./jobs/ai-jobs.service";
 import { EMBEDDING_PROVIDER } from "./providers/embedding.provider";
 import { OllamaEmbeddingProvider } from "./providers/ollama-embedding.provider";
+import { AiResumesController } from "./cvs/ai-resumes.controller";
+import { AiResumesConsumer } from "./cvs/ai-resumes.consumer";
+import { AiResumesService } from "./cvs/ai-resumes.service";
+import { AiResumesProducer } from "./cvs/ai-resumes.producer";
+import { AiApplicationsController } from "./applications/ai-applications.controller";
+import { AiApplicationsConsumer } from "./applications/ai-applications.consumer";
+import { AiApplicationsProducer } from "./applications/ai-applications.producer";
+import { AiApplicationsService } from "./applications/ai-applications.service";
 
 @Module({})
 export class AiModule {
@@ -32,18 +40,32 @@ export class AiModule {
             name: AI_QUEUE_CLIENT,
             imports: [ConfigModule],
             inject: [ConfigService],
-            useFactory: (config: ConfigService) =>
-              aiRmqOptions(rabbitUrl(config)),
+            useFactory: (config: ConfigService) => {
+              const base = aiRmqOptions(rabbitUrl(config));
+              return { ...base, options: { ...base.options, noAck: true } };
+            },
           },
         ]),
       ],
-      controllers: [AiController, AiSearchController, AiJobsConsumer],
+      controllers: [
+        AiController,
+        AiSearchController,
+        AiResumesController,
+        AiJobsConsumer,
+        AiResumesConsumer,
+        AiApplicationsController,
+        AiApplicationsConsumer,
+      ],
       providers: [
         { provide: EMBEDDING_PROVIDER, useClass: OllamaEmbeddingProvider },
         AiService,
         AiJobsService,
         AiJobsProducer,
         AiSearchService,
+        AiResumesService,
+        AiResumesProducer,
+        AiApplicationsProducer,
+        AiApplicationsService,
       ],
       exports: [
         AiService,
@@ -51,6 +73,10 @@ export class AiModule {
         AiJobsService,
         AiJobsProducer,
         AiSearchService,
+        AiResumesService,
+        AiResumesProducer,
+        AiApplicationsService,
+        AiApplicationsProducer,
       ],
     };
   }

@@ -7,6 +7,10 @@ export const AI_QUEUE_CLIENT = "AI_QUEUE_CLIENT";
 
 export const JOB_EMBED_EVENT = "job.embed";
 
+export const APPLICATION_SCORE_EVENT = "application.score";
+
+export const RESUME_PROCESS_EVENT = "resume.process";
+
 export function isAiEnabled(): boolean {
   return (process.env.AI_ENABLED ?? "false").toLowerCase() === "true";
 }

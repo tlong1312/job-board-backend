@@ -4,15 +4,16 @@ import { ApplicationEntity } from "./entities/application.entity";
 import { JobsService } from "../jobs/jobs.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ApplicationStatusHistory } from "./entities/application-status-history.entity";
-import { DataSource, Repository } from 'typeorm';
-import { Injectable } from "@nestjs/common";
-import { JwtUser } from  "commons/decorators/current-user.decorator";
+import { DataSource, Repository } from "typeorm";
+import { Injectable, Optional } from "@nestjs/common";
+import { JwtUser } from "commons/decorators/current-user.decorator";
 import {
   BadRequestException,
   ConflictException,
   ForBiddenException,
   NotFoundException,
 } from "commons/error";
+import { AiApplicationsProducer } from "../ai/applications/ai-applications.producer";
 
 @Injectable()
 export class ApplicationsService {
@@ -26,15 +27,15 @@ export class ApplicationsService {
     private readonly jobsService: JobsService,
 
     private readonly dataSource: DataSource,
+
+    @Optional() private readonly aiApplications?: AiApplicationsProducer,
   ) {}
 
   async create(
     createApplicationDto: CreateApplicationDto,
     candidateId: number,
   ) {
-    const job = await this.jobsService.findOne(
-      createApplicationDto.jobId,
-    );
+    const job = await this.jobsService.findOne(createApplicationDto.jobId);
 
     if (job.status !== "open") {
       throw new BadRequestException(
@@ -46,51 +47,38 @@ export class ApplicationsService {
       const today = new Date();
 
       const year = today.getFullYear();
-      const month = String(
-        today.getMonth() + 1,
-      ).padStart(2, "0");
-      const day = String(
-        today.getDate(),
-      ).padStart(2, "0");
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
 
-      const todayString =
-        `${year}-${month}-${day}`;
+      const todayString = `${year}-${month}-${day}`;
 
       if (job.deadline < todayString) {
-        throw new BadRequestException(
-          "Tin đã hết hạn nộp hồ sơ",
-        );
+        throw new BadRequestException("Tin đã hết hạn nộp hồ sơ");
       }
     }
 
-    const existingApplication =
-      await this.applicationsRepository.findOne({
-        where: {
-          jobId: createApplicationDto.jobId,
-          candidateId,
-        },
-      });
-
-    if (existingApplication) {
-      throw new ConflictException(
-        "Ứng viên đã nộp hồ sơ cho tin này",
-      );
-    }
-
-    const application =
-      this.applicationsRepository.create({
+    const existingApplication = await this.applicationsRepository.findOne({
+      where: {
         jobId: createApplicationDto.jobId,
         candidateId,
-        resumeId:
-          createApplicationDto.resumeId ?? null,
-        coverLetter:
-          createApplicationDto.coverLetter ?? null,
-        status: "new",
-      });
+      },
+    });
 
-    return this.applicationsRepository.save(
-      application,
-    );
+    if (existingApplication) {
+      throw new ConflictException("Ứng viên đã nộp hồ sơ cho tin này");
+    }
+
+    const application = this.applicationsRepository.create({
+      jobId: createApplicationDto.jobId,
+      candidateId,
+      resumeId: createApplicationDto.resumeId ?? null,
+      coverLetter: createApplicationDto.coverLetter ?? null,
+      status: "new",
+    });
+
+    const saved = await this.applicationsRepository.save(application);
+    this.aiApplications?.enqueueScoreApplication(saved.id);
+    return saved;
   }
 
   async findAll(
@@ -109,17 +97,13 @@ export class ApplicationsService {
     }
 
     if (!jobId) {
-      throw new BadRequestException(
-        "Nhà tuyển dụng phải cung cấp jobId",
-      );
+      throw new BadRequestException("Nhà tuyển dụng phải cung cấp jobId");
     }
 
     const job = await this.jobsService.findOne(jobId);
 
     if (job.createdBy !== currentUser.id) {
-      throw new ForBiddenException(
-        "Bạn không phải chủ tin tuyển dụng này",
-      );
+      throw new ForBiddenException("Bạn không phải chủ tin tuyển dụng này");
     }
 
     return this.applicationsRepository.find({
@@ -138,29 +122,20 @@ export class ApplicationsService {
   ): Promise<ApplicationEntity> {
     const application = await this.findOne(id);
 
-    if (
-      application.candidateId !== candidateId
-    ) {
-      throw new ForBiddenException(
-        "Bạn không có quyền xem hồ sơ này",
-      );
+    if (application.candidateId !== candidateId) {
+      throw new ForBiddenException("Bạn không có quyền xem hồ sơ này");
     }
 
     return application;
   }
 
-  async findOne(
-    id: number,
-  ): Promise<ApplicationEntity> {
-    const application =
-      await this.applicationsRepository.findOne({
-        where: { id },
-      });
+  async findOne(id: number): Promise<ApplicationEntity> {
+    const application = await this.applicationsRepository.findOne({
+      where: { id },
+    });
 
     if (!application) {
-      throw new NotFoundException(
-        `Không tìm thấy hồ sơ có id ${id}`,
-      );
+      throw new NotFoundException(`Không tìm thấy hồ sơ có id ${id}`);
     }
 
     return application;
@@ -173,20 +148,14 @@ export class ApplicationsService {
   ) {
     const application = await this.findOne(id);
 
-    const job = await this.jobsService.findOne(
-      application.jobId,
-    );
+    const job = await this.jobsService.findOne(application.jobId);
 
     if (job.createdBy !== employerId) {
-      throw new ForBiddenException(
-        "Bạn không phải chủ tin tuyển dụng này",
-      );
+      throw new ForBiddenException("Bạn không phải chủ tin tuyển dụng này");
     }
 
     if (application.status === dto.status) {
-      throw new BadRequestException(
-        "Hồ sơ đã ở trạng thái này",
-      );
+      throw new BadRequestException("Hồ sơ đã ở trạng thái này");
     }
 
     if (application.status === "rejected") {
@@ -195,40 +164,31 @@ export class ApplicationsService {
       );
     }
 
-    return this.dataSource.transaction(
-      async (manager) => {
-        const oldStatus = application.status;
+    return this.dataSource.transaction(async (manager) => {
+      const oldStatus = application.status;
 
-        application.status = dto.status;
+      application.status = dto.status;
 
-        const updatedApplication =
-          await manager.save(
-            ApplicationEntity,
-            application,
-          );
+      const updatedApplication = await manager.save(
+        ApplicationEntity,
+        application,
+      );
 
-        const history = manager.create(
-          ApplicationStatusHistory,
-          {
-            applicationId: application.id,
-            fromStatus: oldStatus,
-            toStatus: dto.status,
+      const history = manager.create(ApplicationStatusHistory, {
+        applicationId: application.id,
+        fromStatus: oldStatus,
+        toStatus: dto.status,
 
-            // ID lấy từ JWT
-            changedBy: employerId,
+        // ID lấy từ JWT
+        changedBy: employerId,
 
-            note: dto.note ?? null,
-          },
-        );
+        note: dto.note ?? null,
+      });
 
-        await manager.save(
-          ApplicationStatusHistory,
-          history,
-        );
+      await manager.save(ApplicationStatusHistory, history);
 
-        return updatedApplication;
-      },
-    );
+      return updatedApplication;
+    });
   }
 
   async getHistory(
@@ -238,10 +198,7 @@ export class ApplicationsService {
     const application = await this.findOne(id);
 
     if (currentUser.role === "candidate") {
-      if (
-        application.candidateId !==
-        currentUser.id
-      ) {
+      if (application.candidateId !== currentUser.id) {
         throw new ForBiddenException(
           "Bạn không có quyền xem lịch sử hồ sơ này",
         );
@@ -249,14 +206,10 @@ export class ApplicationsService {
     }
 
     if (currentUser.role === "employer") {
-      const job = await this.jobsService.findOne(
-        application.jobId,
-      );
+      const job = await this.jobsService.findOne(application.jobId);
 
       if (job.createdBy !== currentUser.id) {
-        throw new ForBiddenException(
-          "Bạn không phải chủ tin tuyển dụng này",
-        );
+        throw new ForBiddenException("Bạn không phải chủ tin tuyển dụng này");
       }
     }
 
@@ -270,29 +223,18 @@ export class ApplicationsService {
     });
   }
 
-  async remove(
-    id: number,
-    candidateId: number,
-  ) {
+  async remove(id: number, candidateId: number) {
     const application = await this.findOne(id);
 
-    if (
-      application.candidateId !== candidateId
-    ) {
-      throw new ForBiddenException(
-        "Bạn không có quyền rút hồ sơ này",
-      );
+    if (application.candidateId !== candidateId) {
+      throw new ForBiddenException("Bạn không có quyền rút hồ sơ này");
     }
 
     if (application.status !== "new") {
-      throw new BadRequestException(
-        "Chỉ rút được hồ sơ ở trạng thái mới",
-      );
+      throw new BadRequestException("Chỉ rút được hồ sơ ở trạng thái mới");
     }
 
-    await this.applicationsRepository.remove(
-      application,
-    );
+    await this.applicationsRepository.remove(application);
 
     return {
       message: "Rút hồ sơ thành công",
