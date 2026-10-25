@@ -6,18 +6,17 @@ import { Job } from "./entities/job.entity";
 import { AuthModule } from "../auth/auth.module";
 import { CompaniesModule } from "../companies/companies.module";
 import { ApplicationEntity } from "../applications/entities/application.entity";
- 
+import { JobSearchController } from "./search/job-search.controller";
+import { JobSearchService } from "./search/job-search.service";
+
 @Module({
-  // Đăng ký thẳng ApplicationEntity (không import ApplicationsModule) để tránh
-  // vòng phụ thuộc: ApplicationsModule đã import JobsModule.
   imports: [
     TypeOrmModule.forFeature([Job, ApplicationEntity]),
     CompaniesModule,
     AuthModule,
   ],
-  controllers: [JobsController],
-  providers: [JobsService],
+  controllers: [JobsController, JobSearchController],
+  providers: [JobsService, JobSearchService],
   exports: [JobsService],
 })
 export class JobsModule {}
- 
