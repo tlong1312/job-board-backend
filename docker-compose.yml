@@ -34,6 +34,16 @@ services:
     volumes:
       - job_board_redis_data:/data
 
+  # Hộp thư giả cho môi trường dev: nhận mọi email gửi ra, không gửi thật.
+  # Xem thư ở http://localhost:8026 ; SMTP ở cổng 1026.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: job_board_mailpit
+    restart: always
+    ports:
+      - "1026:1025"
+      - "8026:8025"
+
 volumes:
   job_board_pgdata:
   job_board_rabbitmq_data:

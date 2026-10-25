@@ -6,6 +6,7 @@ import { ApplicationEntity } from './entities/application.entity';
 import { ApplicationStatusHistory } from './entities/application-status-history.entity';
 import { JobsService } from '../jobs/jobs.service';
 import { CompaniesService } from '../companies/companies.service';
+import { MailProducer } from '../mail/mail.producer';
 import { ForBiddenException } from 'commons/error';
 import { JwtUser } from 'commons/decorators/current-user.decorator';
 
@@ -27,6 +28,7 @@ describe('ApplicationsService', () => {
         { provide: JobsService, useValue: jobs },
         { provide: CompaniesService, useValue: companies },
         { provide: DataSource, useValue: {} },
+        { provide: MailProducer, useValue: { enqueueStatusChanged: jest.fn() } },
       ],
     }).compile();
 
