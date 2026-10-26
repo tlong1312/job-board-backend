@@ -99,14 +99,12 @@ export class ServiceErrorsFilter implements ExceptionFilter {
         });
       }
 
-      const internalError = new InternalServerException({
-        name: exception?.name,
-        message: exception?.message,
-        code,
-        detail,
-      });
+      const internalError = new InternalServerException(
+        "Lỗi hệ thống, vui lòng thử lại sau",
+      );
       return response.status(internalError.status).json({
         ...internalError,
+        message: "Lỗi hệ thống, vui lòng thử lại sau",
       });
     }
 
@@ -125,6 +123,7 @@ export class ServiceErrorsFilter implements ExceptionFilter {
       return response.status(badRequestException.status).json({
         ...badRequestException,
         message: msg,
+        errors: msg,
       });
     }
 
@@ -137,12 +136,15 @@ export class ServiceErrorsFilter implements ExceptionFilter {
           : Array.isArray(res?.message)
             ? res.message[0]
             : (res?.message ?? exception.message);
-      return response.status(status).json({ status, message, errors: res });
+      return response.status(status).json({ status, message, errors: message });
     }
 
-    const internalError = new InternalServerException(exception?.message);
+    const internalError = new InternalServerException(
+      "Lỗi hệ thống, vui lòng thử lại sau",
+    );
     return response.status(internalError.status).json({
       ...internalError,
+      message: "Lỗi hệ thống, vui lòng thử lại sau",
     });
   }
 }

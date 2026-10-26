@@ -9,9 +9,9 @@ import {
   Query, 
   ParseIntPipe, 
   UseInterceptors, 
-  UploadedFile, 
-  BadRequestException 
+  UploadedFile,
 } from '@nestjs/common';
+import { BadRequestException } from 'commons/error';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
