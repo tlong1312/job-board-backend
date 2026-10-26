@@ -19,13 +19,19 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const { password, email, ...restData } = createUserDto;
+  async create(createUserDto: CreateUserDto & { confirmPassword?: string }) {
+    const {
+      password,
+      email,
+      confirmPassword: _confirmPassword,
+      ...restData
+    } = createUserDto;
     const normalizedEmail = email.trim().toLowerCase();
 
     const existingUser = await this.usersRepository.findOne({
       where: { email: normalizedEmail },
     });
+
     if (existingUser) {
       throw new ConflictException("Email này đã được sử dụng");
     }
@@ -57,8 +63,10 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, currentUser: any) {
-    if (currentUser.role !== 'admin' && currentUser.id !== id) {
-      throw new ForBiddenException("Bạn không có quyền chỉnh sửa thông tin của người khác.");
+    if (currentUser.role !== "admin" && currentUser.id !== id) {
+      throw new ForBiddenException(
+        "Bạn không có quyền chỉnh sửa thông tin của người khác.",
+      );
     }
 
     const user = await this.findOne(id);
@@ -76,8 +84,10 @@ export class UsersService {
   }
 
   async remove(id: number, currentUser: any) {
-    if (currentUser.role !== 'admin' && currentUser.id !== id) {
-      throw new ForBiddenException("Bạn không có quyền khóa tài khoản của người khác.");
+    if (currentUser.role !== "admin" && currentUser.id !== id) {
+      throw new ForBiddenException(
+        "Bạn không có quyền khóa tài khoản của người khác.",
+      );
     }
 
     const user = await this.findOne(id);
