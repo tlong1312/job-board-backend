@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
+  ArrayUnique,
+  IsArray,
   IsDateString,
   IsIn,
   IsInt,
@@ -17,6 +19,7 @@ import {
   type JobLevel,
   type JobType,
 } from "../entities/job.entity";
+import { Type } from "class-transformer";
 
 /**
  * Người đăng (createdBy) lấy từ token qua @CurrentUser(), status luôn là
@@ -113,6 +116,19 @@ export class CreateJobDto {
   @IsString({ message: "Tiền tệ phải là chuỗi" })
   @Length(3, 3, { message: "Tiền tệ phải đúng 3 ký tự" })
   currency?: string;
+
+  @ApiPropertyOptional({
+    example: [1, 2, 3],
+    description: "Danh sách ID kỹ năng của tin tuyển dụng",
+    type: [Number],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  skillIds?: number[];
 
   @ApiPropertyOptional({
     example: "2026-12-31",

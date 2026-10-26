@@ -14,6 +14,8 @@ export const NOTFOUND = "NOTFOUND";
 
 export const SOMETHING_WRONG = "SOMETHING WRONG";
 
+export const NOT_ACCEPTABLE = "NOT ACCEPTABLE";
+
 export const TOKEN_EXPIRED = "TOKEN EXPIRED";
 
 export const CONFLICT = "CONFLICT";
@@ -60,7 +62,7 @@ export class NotFoundException extends BadRequestException {
 export class NotAcceptableException extends BadRequestException {
   constructor(error: any) {
     super(error);
-    this.message = UNAUTHORIZED;
+    this.message = NOT_ACCEPTABLE;
     this.status = HttpStatus.NOT_ACCEPTABLE;
   }
 }
@@ -77,6 +79,7 @@ export class TokenExpiredException extends BadRequestException {
   constructor(error: any) {
     super(error);
     this.message = TOKEN_EXPIRED;
+    this.status = HttpStatus.UNAUTHORIZED;
   }
 }
 
