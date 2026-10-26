@@ -1,4 +1,4 @@
-import { Company } from "src/modules/companies/entity/company.entity";
+import { Company } from "src/modules/companies/entities/company.entity";
 import { Skill } from "src/modules/skills/entities/skill.entity";
 import {
   Column,

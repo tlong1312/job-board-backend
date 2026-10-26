@@ -234,4 +234,13 @@ export class JobsService {
     job.status = "blocked";
     return this.jobsRepository.save(job);
   }
+
+  async findMyJobs(userId: number) {
+    const jobs = await this.jobsRepository.find({
+      where: { createdBy: userId },
+      order: { id: 'DESC' },
+    });
+
+    return jobs;
+  }
 }
