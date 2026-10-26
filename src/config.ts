@@ -35,6 +35,16 @@ export const load = () => {
       port: parseInt(env.REDIS_PORT || "6381", 10),
     },
 
+    // SMTP gửi email. Môi trường dev dùng Mailpit trong docker-compose (xem hộp thư ở http://localhost:8026)
+    mail: {
+      host: env.MAIL_HOST || "localhost",
+      port: parseInt(env.MAIL_PORT || "1026", 10),
+      secure: env.MAIL_SECURE === "true",
+      user: env.MAIL_USER || "",
+      pass: env.MAIL_PASS || "",
+      from: env.MAIL_FROM || "Job Board <no-reply@jobboard.local>",
+    },
+
     // s3: {
     //   accessKeyId: env.VNA_S3_ACCESS_ID,
     //   secretAccessKey: env.VNA_S3_ACCESS_KEY,

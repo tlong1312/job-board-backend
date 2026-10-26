@@ -3,6 +3,8 @@ import { AppModule } from "./app.module";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { ServiceErrorsFilter } from "commons/filters/service.error.filter";
 import { ValidationPipe } from "@nestjs/common";
+import { MicroserviceOptions } from "@nestjs/microservices";
+import { mailRmqOptions } from "./modules/mail/mail.config";
 import { ConfigService } from "@nestjs/config";
 
 import { NestExpressApplication } from "@nestjs/platform-express";
@@ -18,10 +20,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
+  app.useStaticAssets(join(__dirname, "..", "uploads"), {
+    prefix: "/uploads/",
   });
-
 
   app.setGlobalPrefix("api");
   app.useGlobalFilters(new ServiceErrorsFilter());
@@ -31,7 +32,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  
+
   const config = new DocumentBuilder()
     .setTitle("NestJS API")
     .setDescription("The NestJS API description")
@@ -43,6 +44,14 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup("api-docs", app, document);
+
+  app.connectMicroservice<MicroserviceOptions>(
+    mailRmqOptions(
+      configService.get<string>("rabbitmq.url", "amqp://localhost:5673"),
+      "consumer",
+    ),
+  );
+  await app.startAllMicroservices();
 
   const port = configService.get<number>("port") || 3000;
   await app.listen(port);
