@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, ForbiddenException } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -7,7 +7,6 @@ import { Repository } from "typeorm";
 import {
   BadRequestException,
   ConflictException,
-  ForBiddenException,
   NotFoundException,
 } from "commons/error";
 import * as bcrypt from "bcrypt";
@@ -19,19 +18,13 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto & { confirmPassword?: string }) {
-    const {
-      password,
-      email,
-      confirmPassword: _confirmPassword,
-      ...restData
-    } = createUserDto;
+  async create(createUserDto: CreateUserDto) {
+    const { password, email, ...restData } = createUserDto;
     const normalizedEmail = email.trim().toLowerCase();
 
     const existingUser = await this.usersRepository.findOne({
       where: { email: normalizedEmail },
     });
-
     if (existingUser) {
       throw new ConflictException("Email này đã được sử dụng");
     }
@@ -51,22 +44,53 @@ export class UsersService {
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find({ order: { id: "ASC" } });
+    return this.usersRepository.find({ 
+      order: { id: "ASC" },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
+    const user = await this.usersRepository.findOne({ 
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+    
     if (!user) {
       throw new NotFoundException(`Không tìm thấy người dùng có id ${id}`);
     }
     return user;
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository.findOne({ 
+      where: { email: email.trim().toLowerCase() },
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto, currentUser: any) {
-    if (currentUser.role !== "admin" && currentUser.id !== id) {
-      throw new ForBiddenException(
-        "Bạn không có quyền chỉnh sửa thông tin của người khác.",
-      );
+    const currentUserId = +(currentUser.id || currentUser.userId || currentUser.sub);
+
+    if (currentUser.role !== 'admin' && currentUserId !== id) {
+      throw new ForbiddenException("Bạn không có quyền chỉnh sửa thông tin của người khác.");
     }
 
     const user = await this.findOne(id);
@@ -84,10 +108,10 @@ export class UsersService {
   }
 
   async remove(id: number, currentUser: any) {
-    if (currentUser.role !== "admin" && currentUser.id !== id) {
-      throw new ForBiddenException(
-        "Bạn không có quyền khóa tài khoản của người khác.",
-      );
+    const currentUserId = +(currentUser.id || currentUser.userId || currentUser.sub);
+
+    if (currentUser.role !== 'admin' && currentUserId !== id) {
+      throw new ForbiddenException("Bạn không có quyền khóa tài khoản của người khác.");
     }
 
     const user = await this.findOne(id);

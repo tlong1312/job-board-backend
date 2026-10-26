@@ -48,6 +48,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('me')
+  @ApiOperation({ summary: 'Lấy thông tin tài khoản đang đăng nhập' })
+  async getMe(@CurrentUser() currentUser: any) {
+    const id = +(currentUser.id || currentUser.userId || currentUser.sub);
+    return this.usersService.findOne(id);
+  }  
+
   @Get(":id")
   @Roles("admin")
   @ApiOperation({ summary: "Xem một người dùng theo id" })
