@@ -13,6 +13,8 @@ import {
 import { JwtUser } from "commons/decorators/current-user.decorator";
 import { CompaniesService } from "../companies/companies.service";
 import { ApplicationEntity } from "../applications/entities/application.entity";
+import { createPaginationMeta, getPagination } from "commons/helper/pagination";
+import { SkillsService } from "../skills/skills.service";
 
 @Injectable()
 export class JobsService {
@@ -22,6 +24,7 @@ export class JobsService {
     @InjectRepository(ApplicationEntity)
     private readonly applicationsRepository: Repository<ApplicationEntity>,
     private readonly companiesService: CompaniesService,
+    private readonly skillsService: SkillsService,
   ) {}
 
   /** Lương tối đa không được nhỏ hơn lương tối thiểu (chỉ so khi có đủ cả hai). */
@@ -75,36 +78,90 @@ export class JobsService {
     this.validateSalary(createJobDto.salaryMin, createJobDto.salaryMax);
     this.validateDeadline(createJobDto.deadline);
 
+    const { skillIds, ...jobData } = createJobDto;
+
+    const skills = await this.skillsService.findByIds(skillIds ?? []);
+
     const job = this.jobsRepository.create({
-      ...createJobDto,
+      ...jobData,
       createdBy: user.id,
       status: "open",
+      skills,
     });
     return this.jobsRepository.save(job);
   }
 
   /**tin mới nhất lên đầu, lọc theo status; khách/ứng viên chỉ thấy open. */
-  async findAll(query: QueryJobDto = {}, user?: JwtUser): Promise<Job[]> {
+  async findAll(query: QueryJobDto = {}, user?: JwtUser) {
+    const { page, limit, skip } = getPagination(query);
+
     let status = query.status;
+
     if (!this.canSeeAllStatuses(user)) {
-      // xin tin không phải open thì không có gì để thấy
-      if (status && status !== "open") return [];
+      if (status && status !== "open") {
+        return {
+          items: [],
+          meta: createPaginationMeta(page, limit, 0),
+        };
+      }
+
       status = "open";
     }
-    return this.jobsRepository.find({
-      where: status ? { status } : {},
-      order: { createdAt: "DESC", id: "DESC" },
-    });
+
+    const qb = this.jobsRepository
+      .createQueryBuilder("job")
+      .leftJoinAndSelect("job.company", "company")
+      .leftJoinAndSelect("job.skills", "skill")
+      .where("1 = 1");
+
+    if (status) {
+      qb.andWhere("job.status = :status", { status });
+    }
+
+    if (query.province) {
+      qb.andWhere("LOWER(job.province) = LOWER(:province)", {
+        province: query.province,
+      });
+    }
+
+    if (query.level) {
+      qb.andWhere("job.level = :level", {
+        level: query.level,
+      });
+    }
+
+    if (query.companyName) {
+      qb.andWhere("LOWER(company.name) LIKE LOWER(:companyName)", {
+        companyName: `%${query.companyName}%`,
+      });
+    }
+
+    const [items, total] = await qb
+      .orderBy("job.created_at", "DESC")
+      .addOrderBy("job.id", "DESC")
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      items,
+      meta: createPaginationMeta(page, limit, total),
+    };
   }
 
-  /**
-   * tra job.status === "open" và job.deadline). API chi tiết dùng findOneForViewer.
-   */
   async findOne(id: number): Promise<Job> {
-    const job = await this.jobsRepository.findOne({ where: { id } });
+    const job = await this.jobsRepository.findOne({
+      where: { id },
+      relations: {
+        company: true,
+        skills: true,
+      },
+    });
+
     if (!job) {
       throw new NotFoundException("Không tìm thấy việc làm có id " + id);
     }
+
     return job;
   }
 
@@ -139,7 +196,14 @@ export class JobsService {
     );
     this.validateDeadline(updateJobDto.deadline);
 
-    this.jobsRepository.merge(job, updateJobDto);
+    const { skillIds, ...jobData } = updateJobDto;
+
+    this.jobsRepository.merge(job, jobData);
+
+    if (skillIds !== undefined) {
+      job.skills = await this.skillsService.findByIds(skillIds);
+    }
+
     return this.jobsRepository.save(job);
   }
 

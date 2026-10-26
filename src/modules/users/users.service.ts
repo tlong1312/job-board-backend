@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from "@nestjs/common"; // <-- Import thêm ForbiddenException
+import { Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -7,6 +7,7 @@ import { Repository } from "typeorm";
 import {
   BadRequestException,
   ConflictException,
+  ForBiddenException,
   NotFoundException,
 } from "commons/error";
 import * as bcrypt from "bcrypt";
@@ -57,7 +58,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto, currentUser: any) {
     if (currentUser.role !== 'admin' && currentUser.id !== id) {
-      throw new ForbiddenException("Bạn không có quyền chỉnh sửa thông tin của người khác.");
+      throw new ForBiddenException("Bạn không có quyền chỉnh sửa thông tin của người khác.");
     }
 
     const user = await this.findOne(id);
@@ -76,7 +77,7 @@ export class UsersService {
 
   async remove(id: number, currentUser: any) {
     if (currentUser.role !== 'admin' && currentUser.id !== id) {
-      throw new ForbiddenException("Bạn không có quyền khóa tài khoản của người khác.");
+      throw new ForBiddenException("Bạn không có quyền khóa tài khoản của người khác.");
     }
 
     const user = await this.findOne(id);

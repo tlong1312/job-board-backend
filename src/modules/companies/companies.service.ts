@@ -1,10 +1,10 @@
-import { 
-  Injectable, 
-  NotFoundException, 
-  BadRequestException, 
+import { Injectable } from '@nestjs/common';
+import {
+  NotFoundException,
+  BadRequestException,
   ConflictException,
-  ForbiddenException
-} from '@nestjs/common';
+  ForBiddenException,
+} from 'commons/error';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from './entities/company.entity';
@@ -56,7 +56,7 @@ export class CompaniesService {
     });
     
     if (!company) {
-      throw new NotFoundException('Không tìm thấy công ty có id ${id}');
+      throw new NotFoundException(`Không tìm thấy công ty có id ${id}`);
     }
     
     return company;
@@ -84,7 +84,7 @@ export class CompaniesService {
     const company = await this.findOne(id);
 
     if (currentUser.role !== 'admin' && currentUser.id !== company.ownerId) {
-      throw new ForbiddenException('Bạn không có quyền chỉnh sửa thông tin của công ty này');
+      throw new ForBiddenException('Bạn không có quyền chỉnh sửa thông tin của công ty này');
     }
 
     if (updateCompanyDto.name) {
@@ -106,7 +106,7 @@ export class CompaniesService {
     const company = await this.findOne(id);
     
     if (currentUser.role !== 'admin' && currentUser.id !== company.ownerId) {
-      throw new ForbiddenException('Bạn không có quyền xóa công ty này');
+      throw new ForBiddenException('Bạn không có quyền xóa công ty này');
     }
 
     await this.companiesRepository.delete(id);

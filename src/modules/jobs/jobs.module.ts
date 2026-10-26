@@ -8,12 +8,14 @@ import { CompaniesModule } from "../companies/companies.module";
 import { ApplicationEntity } from "../applications/entities/application.entity";
 import { JobSearchController } from "./search/job-search.controller";
 import { JobSearchService } from "./search/job-search.service";
+import { SkillsModule } from "../skills/skills.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Job, ApplicationEntity]),
     CompaniesModule,
     AuthModule,
+    SkillsModule,
   ],
   controllers: [JobsController, JobSearchController],
   providers: [JobsService, JobSearchService],

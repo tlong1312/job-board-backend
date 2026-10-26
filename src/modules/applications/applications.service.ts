@@ -16,6 +16,20 @@ import {
   NotFoundException,
 } from "commons/error";
 
+export interface ApplicationListItem {
+  id: number;
+  jobId: number;
+  candidateId: number;
+  resumeId: number | null;
+  coverLetter: string | null;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  jobTitle: string;
+  companyName: string | null;
+  candidateName: string;
+}
+
 @Injectable()
 export class ApplicationsService {
   constructor(
@@ -85,43 +99,56 @@ export class ApplicationsService {
   async findAll(
     currentUser: JwtUser,
     jobId?: number,
-  ): Promise<ApplicationEntity[]> {
+  ): Promise<ApplicationListItem[]> {
+    const qb = this.applicationsRepository
+      .createQueryBuilder("application")
+      .innerJoin("jobs", "job", "job.id = application.job_id")
+      .innerJoin("companies", "company", "company.id = job.company_id")
+      .innerJoin(
+        "users",
+        "candidate",
+        "candidate.id = application.candidate_id",
+      )
+      .select([
+        "application.id AS id",
+        'application.job_id AS "jobId"',
+        'application.candidate_id AS "candidateId"',
+        'application.resume_id AS "resumeId"',
+        'application.cover_letter AS "coverLetter"',
+        "application.status AS status",
+        'application.created_at AS "createdAt"',
+        'application.updated_at AS "updatedAt"',
+        'job.title AS "jobTitle"',
+        'company.name AS "companyName"',
+        'candidate.full_name AS "candidateName"',
+      ])
+      .orderBy("application.createdAt", "DESC");
+
     if (currentUser.role === "candidate") {
-      return this.applicationsRepository.find({
-        where: {
-          candidateId: currentUser.id,
-        },
-        order: {
-          createdAt: "DESC",
-        },
+      qb.andWhere("application.candidate_id = :candidateId", {
+        candidateId: currentUser.id,
       });
-    }
+    } else if (currentUser.role === "employer") {
+      if (jobId === undefined) {
+        throw new BadRequestException("Nhà tuyển dụng phải cung cấp jobId");
+      }
 
-    if (currentUser.role === "admin") {
-      return this.applicationsRepository.find({
-        where: jobId === undefined ? {} : { jobId },
-        order: { createdAt: "DESC" },
+      await this.assertCompanyOwner(jobId, currentUser.id);
+
+      qb.andWhere("application.job_id = :jobId", {
+        jobId,
       });
-    }
-
-    if (currentUser.role !== "employer") {
+    } else if (currentUser.role === "admin") {
+      if (jobId !== undefined) {
+        qb.andWhere("application.job_id = :jobId", {
+          jobId,
+        });
+      }
+    } else {
       throw new ForBiddenException("Bạn không có quyền xem hồ sơ");
     }
 
-    if (!jobId) {
-      throw new BadRequestException("Nhà tuyển dụng phải cung cấp jobId");
-    }
-
-    await this.assertCompanyOwner(jobId, currentUser.id);
-
-    return this.applicationsRepository.find({
-      where: {
-        jobId,
-      },
-      order: {
-        createdAt: "DESC",
-      },
-    });
+    return qb.getRawMany<ApplicationListItem>();
   }
 
   private async assertCompanyOwner(
