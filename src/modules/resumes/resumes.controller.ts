@@ -6,7 +6,9 @@ import {
   Patch, 
   Param, 
   Delete, 
-  Query, 
+  Query,
+  Res, 
+  StreamableFile,
   ParseIntPipe, 
   UseInterceptors, 
   UploadedFile, 
@@ -14,13 +16,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { ApiTags, ApiOperation, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
-import { ResumesService } from './resumes.service';
+import { extname} from 'path';
+import { Response } from 'express'; 
+import { ApiTags, ApiOperation, ApiQuery, ApiConsumes, ApiBody, ApiProduces } from '@nestjs/swagger';import { ResumesService } from './resumes.service';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
 import { Roles } from 'commons/decorators/roles.decorator';
-import { Public } from 'commons/decorators/public.decorator';
 import { CurrentUser } from 'commons/decorators/current-user.decorator';
 
 @ApiTags('Resumes')
@@ -72,7 +73,7 @@ export class ResumesController {
       if (validMimeTypes.includes(file.mimetype)) {
         callback(null, true); 
       } else {
-        callback(new BadRequestException('Chỉ chấp nhận file PDF hoặc Word (DOC/DOCX)'), false); // Chặn lại
+        callback(new BadRequestException('Chỉ chấp nhận file PDF hoặc Word (DOC/DOCX)'), false); 
       }
     },
   }))
@@ -109,33 +110,54 @@ export class ResumesController {
     if (currentUser.role === 'admin') { 
       targetUserId = queryUserId ? +queryUserId : undefined;
     } else {
-      targetUserId = currentUser.userId;
+      targetUserId = currentUser.id || currentUser.userId;
     }
 
     return this.resumesService.findAll(targetUserId);
   }
 
-  @Get(':id')
-  @Public()
-  @ApiOperation({ summary: 'Lấy chi tiết một CV' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.resumesService.findOne(id);
+  @Get('users/me')
+  @ApiOperation({ summary: 'Lấy danh sách CV của tài khoản đang đăng nhập' })
+  findMyResumes(@CurrentUser() currentUser: any) {
+    const id = currentUser.id || currentUser.sub;
+    return this.resumesService.findAll(+id);
   }
 
+  @Get(':id/file')
+  @ApiOperation({ summary: 'Xem trực tiếp file CV (Inline)' })
+  @ApiProduces('application/pdf', 'application/msword', 'application/octet-stream')
+  async getResumeFile(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() currentUser: any,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const fileData = await this.resumesService.getResumeFileStream(id, currentUser);
+
+    res.set({
+      'Content-Type': fileData.mimeType, 
+      'Content-Disposition': `inline; filename="${fileData.fileName}"`, 
+    });
+  return new StreamableFile(fileData.stream);
+}
+
   @Patch(':id')
-  @Roles('candidate')
+  @Roles('candidate', 'admin')
   @ApiOperation({ summary: 'Cập nhật CV' })
   update(
     @Param('id', ParseIntPipe) id: number, 
-    @Body() updateResumeDto: UpdateResumeDto
+    @Body() updateResumeDto: UpdateResumeDto,
+    @CurrentUser() currentUser: any 
   ) {
-    return this.resumesService.update(id, updateResumeDto);
+    return this.resumesService.update(id, updateResumeDto, currentUser); 
   }
 
   @Delete(':id')
   @Roles('candidate', 'admin')
   @ApiOperation({ summary: 'Xóa CV' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.resumesService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() currentUser: any
+  ) {
+    return this.resumesService.remove(id, currentUser);
   }
 }
