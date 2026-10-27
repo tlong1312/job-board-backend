@@ -142,6 +142,11 @@ export class JobsService {
       qb.andWhere("job.status = :status", { status });
     }
 
+    // Khách/ứng viên không thấy tin đã quá hạn nộp (employer/admin vẫn thấy để quản lý)
+    if (!this.canSeeAllStatuses(user)) {
+      qb.andWhere("(job.deadline IS NULL OR job.deadline >= CURRENT_DATE)");
+    }
+
     if (query.province) {
       qb.andWhere("LOWER(job.province) = LOWER(:province)", {
         province: query.province,
@@ -200,7 +205,11 @@ export class JobsService {
     };
     // Tin không open ném 404 trước khi tới bước lưu, nên cache chỉ chứa tin open.
     if (this.redis && !this.canSeeAllStatuses(user)) {
-      return this.redis.remember(`jobs:detail:${id}`, PUBLIC_CACHE_TTL_SECONDS, load);
+      return this.redis.remember(
+        `jobs:detail:${id}`,
+        PUBLIC_CACHE_TTL_SECONDS,
+        load,
+      );
     }
     return load();
   }
@@ -274,7 +283,7 @@ export class JobsService {
   async findMyJobs(userId: number) {
     const jobs = await this.jobsRepository.find({
       where: { createdBy: userId },
-      order: { id: 'DESC' },
+      order: { id: "DESC" },
     });
 
     return jobs;

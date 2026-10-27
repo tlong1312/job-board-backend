@@ -3,6 +3,7 @@ import { UpdateApplicationStatusDto } from "./dto/update-application-status.dto"
 import { ApplicationEntity } from "./entities/application.entity";
 import { JobsService } from "../jobs/jobs.service";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Resume } from "../resumes/entities/resume.entity";
 import { ApplicationStatusHistory } from "./entities/application-status-history.entity";
 import { DataSource, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
@@ -39,6 +40,9 @@ export class ApplicationsService {
     @InjectRepository(ApplicationStatusHistory)
     private readonly historyRepository: Repository<ApplicationStatusHistory>,
 
+    @InjectRepository(Resume)
+    private readonly resumesRepository: Repository<Resume>,
+
     private readonly jobsService: JobsService,
 
     private readonly dataSource: DataSource,
@@ -71,6 +75,20 @@ export class ApplicationsService {
 
       if (job.deadline < todayString) {
         throw new BadRequestException("Tin đã hết hạn nộp hồ sơ");
+      }
+    }
+
+    if (createApplicationDto.resumeId != null) {
+      const resume = await this.resumesRepository.findOne({
+        where: {
+          id: createApplicationDto.resumeId,
+          userId: candidateId,
+        },
+      });
+      if (!resume) {
+        throw new ForBiddenException(
+          "CV không tồn tại hoặc không thuộc về bạn",
+        );
       }
     }
 

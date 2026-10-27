@@ -48,12 +48,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get('me')
-  @ApiOperation({ summary: 'Lấy thông tin tài khoản đang đăng nhập' })
+  @Get("me")
+  @ApiOperation({ summary: "Lấy thông tin tài khoản đang đăng nhập" })
   async getMe(@CurrentUser() currentUser: any) {
     const id = +(currentUser.id || currentUser.userId || currentUser.sub);
     return this.usersService.findOne(id);
-  }  
+  }
 
   @Get(":id")
   @Roles("admin")
@@ -92,6 +92,16 @@ export class UsersController {
     @CurrentUser() currentUser: any,
   ) {
     return this.usersService.remove(id, currentUser);
+  }
+
+  @Patch("unlock/:id")
+  @Roles("admin")
+  @ApiOperation({ summary: "Admin mở khoá tài khoản" })
+  @ApiOkResponse({ description: "Mở khoá thành công" })
+  @ApiBadRequestResponse({ description: "Tài khoản đang hoạt động" })
+  @ApiNotFoundResponse({ description: "Không tìm thấy người dùng" })
+  unlock(@Param("id", ParseIntPipe) id: number) {
+    return this.usersService.unlock(id);
   }
 
   @Delete(":id")

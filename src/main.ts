@@ -20,8 +20,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useStaticAssets(join(__dirname, "..", "uploads"), {
-    prefix: "/uploads/",
+  // Chỉ công khai thư mục logo. CV nằm ở uploads/ phải tải qua GET /resumes/:id/file (có kiểm tra quyền).
+  app.useStaticAssets(join(__dirname, "..", "uploads", "logos"), {
+    prefix: "/uploads/logos/",
   });
 
   app.setGlobalPrefix("api");
@@ -34,12 +35,13 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle("NestJS API")
-    .setDescription("The NestJS API description")
+    .setTitle("Job Board API")
+    .setDescription(
+      "API hệ thống tuyển dụng: xác thực, tin tuyển dụng, hồ sơ ứng tuyển, CV",
+    )
     .setVersion("1.0")
     .addBearerAuth()
     .addSecurityRequirements("bearer")
-    .addTag("nestjs")
     .build();
   const document = SwaggerModule.createDocument(app, config);
 

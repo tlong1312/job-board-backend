@@ -75,7 +75,7 @@ export class ResumesService {
       const isEmployer = await this.checkEmployerAccess(userId, resume.id);
 
       if (!isAdmin && !isOwner && !isEmployer) {
-        throw new BadRequestException(
+        throw new ForBiddenException(
           "Truy cập bị từ chối. Bạn không có quyền xem CV này.",
         );
       }
@@ -172,7 +172,7 @@ export class ResumesService {
     const isOwner = resume.userId === currentUserId;
 
     if (!isAdmin && !isOwner) {
-      throw new BadRequestException(
+      throw new ForBiddenException(
         "Truy cập bị từ chối. Bạn chỉ được phép xóa CV của chính mình.",
       );
     }

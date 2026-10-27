@@ -44,7 +44,7 @@ export class UsersService {
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find({ 
+    return this.usersRepository.find({
       order: { id: "ASC" },
       select: {
         id: true,
@@ -54,13 +54,13 @@ export class UsersService {
         role: true,
         isActive: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ 
+    const user = await this.usersRepository.findOne({
       where: { id },
       select: {
         id: true,
@@ -70,10 +70,10 @@ export class UsersService {
         role: true,
         isActive: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
-    
+
     if (!user) {
       throw new NotFoundException(`Không tìm thấy người dùng có id ${id}`);
     }
@@ -81,16 +81,22 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.usersRepository.findOne({ 
+    return await this.usersRepository.findOne({
       where: { email: email.trim().toLowerCase() },
     });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, currentUser: any) {
-    const currentUserId = +(currentUser.id || currentUser.userId || currentUser.sub);
+    const currentUserId = +(
+      currentUser.id ||
+      currentUser.userId ||
+      currentUser.sub
+    );
 
-    if (currentUser.role !== 'admin' && currentUserId !== id) {
-      throw new ForbiddenException("Bạn không có quyền chỉnh sửa thông tin của người khác.");
+    if (currentUser.role !== "admin" && currentUserId !== id) {
+      throw new ForbiddenException(
+        "Bạn không có quyền chỉnh sửa thông tin của người khác.",
+      );
     }
 
     const user = await this.findOne(id);
@@ -108,10 +114,16 @@ export class UsersService {
   }
 
   async remove(id: number, currentUser: any) {
-    const currentUserId = +(currentUser.id || currentUser.userId || currentUser.sub);
+    const currentUserId = +(
+      currentUser.id ||
+      currentUser.userId ||
+      currentUser.sub
+    );
 
-    if (currentUser.role !== 'admin' && currentUserId !== id) {
-      throw new ForbiddenException("Bạn không có quyền khóa tài khoản của người khác.");
+    if (currentUser.role !== "admin" && currentUserId !== id) {
+      throw new ForbiddenException(
+        "Bạn không có quyền khóa tài khoản của người khác.",
+      );
     }
 
     const user = await this.findOne(id);
@@ -124,6 +136,45 @@ export class UsersService {
     const deletedUser = await this.usersRepository.save(user);
     const { passwordHash: _, ...result } = deletedUser;
     return result;
+  }
+
+  /** Admin mở khoá tài khoản đã bị khoá. */
+  async unlock(id: number) {
+    const user = await this.findOne(id);
+    if (user.isActive) {
+      throw new BadRequestException(
+        "Tài khoản đang hoạt động, không cần mở khoá",
+      );
+    }
+    user.isActive = true;
+    const saved = await this.usersRepository.save(user);
+    const { passwordHash: _, ...result } = saved;
+    return result;
+  }
+
+  /** Đổi mật khẩu: phải đúng mật khẩu cũ. */
+  async changePassword(
+    id: number,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.usersRepository
+      .createQueryBuilder("u")
+      .addSelect("u.passwordHash")
+      .where("u.id = :id", { id })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException(`Không tìm thấy người dùng có id ${id}`);
+    }
+    const ok = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!ok) {
+      throw new BadRequestException("Mật khẩu hiện tại không đúng");
+    }
+    if (currentPassword === newPassword) {
+      throw new BadRequestException("Mật khẩu mới phải khác mật khẩu cũ");
+    }
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await this.usersRepository.save(user);
   }
 
   async hardRemove(id: number) {

@@ -66,12 +66,17 @@ export class JobSearchService {
     return this.redis.remember(key, 60, () => this.runSearch(tokens, limit));
   }
 
-  private async runSearch(tokens: string[], limit: number): Promise<JobSearchHit[]> {
+  private async runSearch(
+    tokens: string[],
+    limit: number,
+  ): Promise<JobSearchHit[]> {
     const rows = await this.dataSource.query(
       `SELECT j.id, j.title, j.level, j.province, j.location,
               ts_rank_cd(j.search_vector, q.query)::float AS score
          FROM jobs j, (SELECT to_tsquery('simple', $1) AS query) q
-        WHERE j.status = 'open' AND j.search_vector @@ q.query
+        WHERE j.status = 'open'
+          AND (j.deadline IS NULL OR j.deadline >= CURRENT_DATE)
+          AND j.search_vector @@ q.query
         ORDER BY score DESC, j.id
         LIMIT $2`,
       [tokens.join(" | "), limit],

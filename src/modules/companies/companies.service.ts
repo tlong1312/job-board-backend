@@ -1,17 +1,18 @@
-import { Injectable, Optional } from '@nestjs/common';
+import { Injectable, Optional } from "@nestjs/common";
 import {
   NotFoundException,
   BadRequestException,
   ConflictException,
   ForBiddenException,
-} from 'commons/error';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Company } from './entities/company.entity';
-import { CreateCompanyDto } from './dto/create-company.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
-import { UsersService } from '../users/users.service';
-import { RedisService } from '../redis/redis.service';
+} from "commons/error";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Company } from "./entities/company.entity";
+import { CreateCompanyDto } from "./dto/create-company.dto";
+import { UpdateCompanyDto } from "./dto/update-company.dto";
+import { UsersService } from "../users/users.service";
+import type { JwtUser } from "commons/decorators/current-user.decorator";
+import { RedisService } from "../redis/redis.service";
 
 @Injectable()
 export class CompaniesService {
@@ -25,8 +26,8 @@ export class CompaniesService {
   async create(createCompanyDto: CreateCompanyDto) {
     const owner = await this.usersService.findOne(createCompanyDto.ownerId);
 
-    if (owner.role !== 'employer') {
-      throw new BadRequestException('Chỉ nhà tuyển dụng mới được tạo công ty');
+    if (owner.role !== "employer") {
+      throw new BadRequestException("Chỉ nhà tuyển dụng mới được tạo công ty");
     }
 
     const existingCompany = await this.companiesRepository.findOne({
@@ -34,7 +35,7 @@ export class CompaniesService {
     });
 
     if (existingCompany) {
-      throw new ConflictException('Bạn đã có công ty cùng tên');
+      throw new ConflictException("Bạn đã có công ty cùng tên");
     }
 
     const newCompany = this.companiesRepository.create(createCompanyDto);
@@ -42,51 +43,51 @@ export class CompaniesService {
   }
 
   async findAll() {
-    return await this.companiesRepository.find({ 
-      relations: {
-        owner: true 
-      } 
-    }); 
+    return await this.companiesRepository.find();
   }
 
   async findOne(id: number) {
-    const company = await this.companiesRepository.findOne({ 
+    const company = await this.companiesRepository.findOne({
       where: { id },
-      relations: {
-        owner: true
-      } 
     });
-    
+
     if (!company) {
       throw new NotFoundException(`Không tìm thấy công ty có id ${id}`);
     }
-    
+
     return company;
   }
 
   async findByOwnerId(ownerId: number) {
     const owner = await this.usersService.findOne(ownerId);
-    
+
     if (!owner) {
-      throw new NotFoundException(`Không tìm thấy người dùng có id là ${ownerId}`);
+      throw new NotFoundException(
+        `Không tìm thấy người dùng có id là ${ownerId}`,
+      );
     }
     const companies = await this.companiesRepository.find({
       where: { ownerId },
-      relations: {
-        owner: true 
-      }
     });
     if (companies.length === 0) {
-      throw new NotFoundException(`Người dùng với id ${ownerId} hiện chưa tạo công ty nào`);
+      throw new NotFoundException(
+        `Người dùng với id ${ownerId} hiện chưa tạo công ty nào`,
+      );
     }
     return companies;
   }
 
-  async update(id: number, updateCompanyDto: UpdateCompanyDto, currentUser: any) {
+  async update(
+    id: number,
+    updateCompanyDto: UpdateCompanyDto,
+    currentUser: JwtUser,
+  ) {
     const company = await this.findOne(id);
 
-    if (currentUser.role !== 'admin' && currentUser.id !== company.ownerId) {
-      throw new ForBiddenException('Bạn không có quyền chỉnh sửa thông tin của công ty này');
+    if (currentUser.role !== "admin" && currentUser.id !== company.ownerId) {
+      throw new ForBiddenException(
+        "Bạn không có quyền chỉnh sửa thông tin của công ty này",
+      );
     }
 
     if (updateCompanyDto.name) {
@@ -95,27 +96,27 @@ export class CompaniesService {
       });
 
       if (existingCompany && existingCompany.id !== id) {
-        throw new ConflictException('Bạn đã có công ty cùng tên');
+        throw new ConflictException("Bạn đã có công ty cùng tên");
       }
     }
 
     await this.companiesRepository.update(id, updateCompanyDto);
     // tên/logo công ty nằm trong dữ liệu tin tuyển dụng đã cache
     await this.redis?.invalidatePublicCache();
-    
-    return this.findOne(id); 
+
+    return this.findOne(id);
   }
 
-  async remove(id: number, currentUser: any) {
+  async remove(id: number, currentUser: JwtUser) {
     const company = await this.findOne(id);
-    
-    if (currentUser.role !== 'admin' && currentUser.id !== company.ownerId) {
-      throw new ForBiddenException('Bạn không có quyền xóa công ty này');
+
+    if (currentUser.role !== "admin" && currentUser.id !== company.ownerId) {
+      throw new ForBiddenException("Bạn không có quyền xóa công ty này");
     }
 
     await this.companiesRepository.delete(id);
     await this.redis?.invalidatePublicCache();
-    
+
     return {
       statusCode: 200,
       message: `Đã xóa thành công công ty có id ${id}`,
