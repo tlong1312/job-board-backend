@@ -9,6 +9,7 @@ import { ApplicationEntity } from "../applications/entities/application.entity";
 import { JobSearchController } from "./search/job-search.controller";
 import { JobSearchService } from "./search/job-search.service";
 import { SkillsModule } from "../skills/skills.module";
+import { RedisModule } from "../redis/redis.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SkillsModule } from "../skills/skills.module";
     CompaniesModule,
     AuthModule,
     SkillsModule,
+    RedisModule,
   ],
   controllers: [JobsController, JobSearchController],
   providers: [JobsService, JobSearchService],

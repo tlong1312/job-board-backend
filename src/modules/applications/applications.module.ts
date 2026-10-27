@@ -7,6 +7,7 @@ import { ApplicationStatusHistory } from "./entities/application-status-history.
 import { CompaniesModule } from "../companies/companies.module";
 import { JobsModule } from "../jobs/jobs.module";
 import { MailModule } from "../mail/mail.module";
+import { RedisModule } from "../redis/redis.module";
 
 @Module({
   imports: 
@@ -17,6 +18,7 @@ import { MailModule } from "../mail/mail.module";
     JobsModule,
     CompaniesModule,
     MailModule,
+    RedisModule,
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

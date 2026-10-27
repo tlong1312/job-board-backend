@@ -7,11 +7,13 @@ import { ApplicationEntity } from '../applications/entities/application.entity';
 import { Job } from '../jobs/entities/job.entity';
 import { Company } from '../companies/entities/company.entity';
 import { UsersModule } from '../users/users.module';
+import { RedisModule } from "../redis/redis.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Resume, ApplicationEntity, Job, Company]), 
-    UsersModule
+    UsersModule,
+    RedisModule,
   ],
   controllers: [ResumesController],
   providers: [ResumesService],

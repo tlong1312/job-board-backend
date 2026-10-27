@@ -14,6 +14,7 @@ import { LocalAuthGuard } from "commons/guards/local-auth.guard";
 import { LoginDto } from "./dto/login.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
 import { Public } from "commons/decorators/public.decorator";
+import { RateLimit, RateLimitGuard } from "../redis/rate-limit.guard";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -22,6 +23,8 @@ export class AuthController {
 
   @Post("register")
   @Public()
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 5, windowSeconds: 60 })
   @ApiOperation({ summary: "Đăng ký tài khoản" })
   @ApiResponse({
     status: 201,
@@ -36,7 +39,8 @@ export class AuthController {
   @Post("login")
   @Public()
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(RateLimitGuard, LocalAuthGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60 })
   @ApiBody({ type: LoginDto })
   @ApiOperation({ summary: "Đăng nhập bằng email và mật khẩu" })
   @ApiResponse({

@@ -12,7 +12,9 @@ import {
   ParseIntPipe, 
   UseInterceptors, 
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
+import { RateLimit, RateLimitGuard } from '../redis/rate-limit.guard';
 import { BadRequestException } from 'commons/error';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -31,6 +33,8 @@ export class ResumesController {
 
   @Post()
   @Roles('candidate')
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60 })
   @ApiOperation({ summary: 'Tải CV lên và lưu trực tiếp vào Database' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({

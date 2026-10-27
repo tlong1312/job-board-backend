@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete, Query, UseGuards } from '@nestjs/common';
+import { RateLimit, RateLimitGuard } from '../redis/rate-limit.guard';
 import { ApplicationsService } from "./applications.service";
 import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationStatusDto } from "./dto/update-application-status.dto";
@@ -32,6 +33,8 @@ export class ApplicationsController {
 
   @Post()
   @Roles("candidate")
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60 })
   @ApiOperation({
     summary: "Ứng viên nộp hồ sơ vào tin tuyển dụng",
   })

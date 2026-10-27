@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import {
   NotFoundException,
   BadRequestException,
@@ -11,6 +11,7 @@ import { Company } from './entities/company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { UsersService } from '../users/users.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class CompaniesService {
@@ -18,6 +19,7 @@ export class CompaniesService {
     @InjectRepository(Company)
     private companiesRepository: Repository<Company>,
     private usersService: UsersService,
+    @Optional() private readonly redis?: RedisService,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto) {
@@ -98,6 +100,8 @@ export class CompaniesService {
     }
 
     await this.companiesRepository.update(id, updateCompanyDto);
+    // tên/logo công ty nằm trong dữ liệu tin tuyển dụng đã cache
+    await this.redis?.invalidatePublicCache();
     
     return this.findOne(id); 
   }
@@ -110,6 +114,7 @@ export class CompaniesService {
     }
 
     await this.companiesRepository.delete(id);
+    await this.redis?.invalidatePublicCache();
     
     return {
       statusCode: 200,

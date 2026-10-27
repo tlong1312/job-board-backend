@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Optional } from "@nestjs/common";
 import { DataSource } from "typeorm";
+import { RedisService } from "../../redis/redis.service";
 
 export interface JobSearchHit {
   id: number;
@@ -52,11 +53,20 @@ export function tokenize(query: string): string[] {
 
 @Injectable()
 export class JobSearchService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional() private readonly redis?: RedisService,
+  ) {}
 
   async search(query: string, limit = 10): Promise<JobSearchHit[]> {
     const tokens = tokenize(query.trim());
     if (tokens.length === 0) return [];
+    const key = `search:${limit}:${tokens.join(" ")}`;
+    if (!this.redis) return this.runSearch(tokens, limit);
+    return this.redis.remember(key, 60, () => this.runSearch(tokens, limit));
+  }
+
+  private async runSearch(tokens: string[], limit: number): Promise<JobSearchHit[]> {
     const rows = await this.dataSource.query(
       `SELECT j.id, j.title, j.level, j.province, j.location,
               ts_rank_cd(j.search_vector, q.query)::float AS score
