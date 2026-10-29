@@ -14,8 +14,19 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
+  // CORS: production chỉ cho các origin khai báo trong CORS_ORIGINS (cách nhau bằng dấu phẩy).
+  // Môi trường dev (không đặt biến) cho mọi origin để chạy frontend cục bộ.
+  const corsOrigins = (process.env.CORS_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: true,
+    origin:
+      corsOrigins.length > 0
+        ? corsOrigins
+        : process.env.NODE_ENV === "production"
+          ? false
+          : true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
   });

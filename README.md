@@ -1,106 +1,74 @@
-# Tìm hiểu và Ứng dụng NestJS: Xây dựng Backend Hệ thống Tuyển dụng (Job Board)
+# Job Board Backend (NestJS)
 
-Dự án tập trung nghiên cứu sâu kiến trúc **NestJS** chuẩn kỹ nghệ phần mềm và giải quyết các bài toán kỹ thuật Backend nâng cao thông qua bài toán minh họa là Hệ thống Tuyển dụng (Job Board).
+Backend REST API cho website đăng tin tuyển dụng, làm cho môn Các Công nghệ Lập trình Hiện đại. Ba vai trò: ứng viên (`candidate`), nhà tuyển dụng (`employer`) và quản trị viên (`admin`). Hệ thống chỉ là phương tiện để áp dụng các cơ chế của NestJS.
 
-Stack công nghệ sử dụng: **NestJS, PostgreSQL (pgvector), Redis, RabbitMQ & Docker**.
+Công nghệ: NestJS 11, TypeORM, PostgreSQL 16, Redis, RabbitMQ, Mailpit (hộp thư giả khi dev), Jest, Swagger.
 
-## Trọng tâm Công nghệ & Kiến trúc (Technical Focus)
+## Các module (src/modules)
 
-Hệ thống loại bỏ các quy trình nghiệp vụ rườm rà, tập trung 100% vào các luồng kỹ thuật cốt lõi:
+| Module | Nội dung |
+|---|---|
+| auth | Đăng ký, đăng nhập, refresh token, đổi mật khẩu, đăng xuất (JWT, bcrypt) |
+| users | Hồ sơ người dùng, khoá và mở khoá tài khoản |
+| companies | Công ty của nhà tuyển dụng (một nhà tuyển dụng có nhiều công ty) |
+| jobs | Tin tuyển dụng, lọc và phân trang; `jobs/search` là tìm kiếm full-text (`GET /api/search/jobs?q=`) |
+| resumes | Tải CV, CV mặc định, xem file có kiểm tra quyền |
+| applications | Nộp hồ sơ, đổi trạng thái (có transaction và lịch sử), rút hồ sơ |
+| skills | Danh mục kỹ năng của tin |
+| redis | Cache danh sách và chi tiết tin (TTL 60 giây), giới hạn tần suất (`@RateLimit`) |
+| mail | Hàng đợi RabbitMQ gửi email khi đổi trạng thái hồ sơ, có nhật ký `email_logs` |
 
-1. **Kiến trúc & Phân quyền (NestJS Core, Guards, Interceptors):**
-   - Tổ chức code theo kiến trúc Modular, áp dụng Dependency Injection (DI), Custom Pipes và Exception Filters.
-   - Xác thực JWT và phân quyền RBAC (`RolesGuard`) cho 3 vai trò: `CANDIDATE` (Ứng viên), `EMPLOYER` (Nhà tuyển dụng), và `ADMIN` (Quản trị viên).
-2. **Xử lý bất đồng bộ (RabbitMQ Worker):**
-   - Đẩy tác vụ nặng (đọc file PDF CV của ứng viên và gọi API bóc tách dữ liệu JSON) xuống hàng đợi chạy ngầm, giúp giải phóng luồng chính và phản hồi HTTP tức thì.
-3. **Tìm kiếm ngữ nghĩa - Semantic Search (PostgreSQL + pgvector):**
-   - Vector hóa nội dung tin tuyển dụng và hồ sơ ứng viên, kết hợp đánh chỉ mục HNSW để so khớp độ tương đồng ngữ nghĩa nhanh chóng.
-4. **Tối ưu hiệu năng & Bảo vệ tài nguyên (Redis):**
-   - **Caching:** Lưu đệm danh sách công việc tuyển dụng giúp giảm tải truy vấn xuống Database.
-   - **Rate Limiting:** Kiểm soát tần suất gửi request (chống spam API tải lên CV và tìm kiếm).
+`src/commons` chứa lớp lỗi, `ServiceErrorsFilter`, `JwtAuthGuard`, `RolesGuard`, các decorator `@Public`, `@Roles`, `@CurrentUser`. Mọi route mặc định phải đăng nhập, route công khai ghi `@Public()`.
 
-## Cấu trúc Thư mục Đề tài
+## Yêu cầu
 
-```text
-src/
-├── common/               # Guards (JWT, Roles), Decorators, Filters, Interceptors
-├── config/               # Cấu hình biến môi trường (Database, Redis, RabbitMQ)
-├── modules/
-│   ├── auth/             # Xác thực người dùng & cấp phát Token
-│   ├── users/            # Quản lý tài khoản (Candidate, Employer, Admin)
-│   ├── jobs/             # CRUD tin tuyển dụng, Redis Cache & Semantic Search (pgvector)
-│   ├── resumes/          # Upload CV & đẩy sự kiện vào hàng đợi
-│   ├── applications/     # Luồng nộp đơn ứng tuyển & phân quyền dữ liệu
-│   └── queue/            # RabbitMQ Producers & Consumers xử lý bóc tách CV ngầm
-└── main.ts
-```
+Node.js 20 trở lên, Docker Desktop, Git.
 
-## Yêu cầu hệ thống (Prerequisites)
-
-- **Node.js**: Phiên bản 20.x trở lên.
-- **Docker Desktop**: Bắt buộc phải cài để chạy hạ tầng Database, Cache và Message Queue.
-- **Git**: Khuyên dùng Git Bash trên Windows.
-
-## Hướng dẫn cài đặt & Khởi chạy dự án
-
-**Bước 1: Clone dự án và cài đặt thư viện**
-Mở terminal và chạy lần lượt các lệnh sau:
+## Chạy dự án
 
 ```bash
 git clone https://github.com/tlong1312/job-board-backend.git
 cd job-board-backend
+cp .env.example .env        # Windows PowerShell: copy .env.example .env
+# Sửa JWT_ACCESS_SECRET và JWT_REFRESH_SECRET thành chuỗi ngẫu nhiên riêng
+docker compose up -d        # postgres (5435), redis (6381), rabbitmq (5673, quản trị 15673), mailpit (SMTP 1026, xem thư 8026)
 npm install
-```
-
-_(Lưu ý: Chỉ sử dụng `npm install`, không dùng yarn hay pnpm để tránh sai lệch file lock)._
-
-**Bước 2: Cấu hình biến môi trường (.env)**
-Tạo file `.env` ở thư mục gốc bằng cách copy từ mẫu:
-
-```bash
-cp .env.example .env
-```
-
-Mở file `.env` vừa tạo và điền các thông số chuẩn cho môi trường local:
-
-```env
-PORT=3000
-
-# PostgreSQL (Dùng cho TypeORM và pgvector cho Semantic Search)
-DB_HOST=localhost
-DB_PORT=5435
-DB_USER=postgres
-DB_PASS=secret123
-DB_NAME=job_board_db
-
-# RabbitMQ (Xử lý bất đồng bộ luồng đọc file CV)
-RABBITMQ_URL=amqp://localhost:5673
-
-# Redis (Caching & Rate Limiting)
-REDIS_HOST=localhost
-REDIS_PORT=6381
-```
-
-**Bước 3: Dựng hạ tầng với Docker**
-Đảm bảo Docker Desktop đang mở, chạy lệnh sau để kéo image và khởi động các services (PostgreSQL, RabbitMQ, Redis):
-
-```bash
-docker compose up -d
-```
-
-**Bước 4: Khởi chạy Server NestJS**
-
-```bash
 npm run start:dev
 ```
 
-Server sẽ chạy tại `http://localhost:3000`. Chế độ Hot-reload đã được bật, code lưu file là server tự restart.
+- Swagger: http://localhost:3000/api-docs
+- Xem email giả: http://localhost:8026
+- Tài khoản mẫu (mật khẩu `Password@123`): `admin@jobboard.local`, `employer@jobboard.local`, `candidate@jobboard.local`
 
-## Quy trình Commit & Push Code (Quan trọng)
+## Cơ sở dữ liệu
 
-Hệ thống đã được tích hợp GitHub Actions chặn lỗi tự động (CI). Vui lòng tuân thủ quy trình sau:
+Lược đồ nằm ở `init.sql` (chạy tự động khi volume Postgres còn trống). Đổi lược đồ trên DB đã có dữ liệu dùng `npm run db:migrate`; nạp 300 tin để đo hiệu năng dùng `npm run db:seed`. `docker compose down -v` xoá toàn bộ dữ liệu nên chỉ dùng khi muốn reset. Chi tiết ở [docs/DATABASE.md](docs/DATABASE.md).
 
-1. Không code trực tiếp trên nhánh `main`. Hãy tạo nhánh riêng: `git checkout -b feature/ten-chuc-nang`
-2. Đặt tên commit có tiền tố rõ ràng: `feat:` (tính năng mới), `fix:` (sửa lỗi), `chore:` (cấu hình), `refactor:` (tối ưu code).
-3. Sau khi push nhánh lên GitHub, tạo Pull Request (PR).
-4. **Chỉ merge code khi tiến trình "Backend CI" trên GitHub báo tích xanh.** Nếu báo đỏ, vui lòng click vào xem log lỗi (thường là lỗi ESLint hoặc sai kiểu TypeScript) và fix lại.
+## Kiểm thử
+
+```bash
+npm test            # unit test (Jest)
+npm run test:e2e    # e2e
+npm run lint
+npm run build
+node scripts/e2e-flow.js            # chạy luồng nghiệp vụ qua API đang chạy, in bảng kết quả
+node scripts/bench.js fts           # đo ILIKE so với full-text trên DB hiện tại
+node scripts/bench.js http --url "http://localhost:3000/api/jobs?level=junior" --label "Có cache"
+```
+
+CI (GitHub Actions) chạy lint, build và unit test cho mỗi push và pull request.
+
+## Cấu hình quan trọng
+
+| Biến | Ý nghĩa |
+|---|---|
+| `DB_*` | Kết nối PostgreSQL (mặc định khớp docker-compose) |
+| `REDIS_HOST`, `REDIS_PORT` | Redis cho cache và rate limit; Redis lỗi thì API vẫn chạy bằng DB |
+| `RABBITMQ_URL` | Hàng đợi gửi email |
+| `MAIL_*` | SMTP; mặc định trỏ vào Mailpit |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Khoá ký token, bắt buộc tự sinh riêng |
+| `CORS_ORIGINS` | Danh sách origin được gọi API, cách nhau bằng dấu phẩy. Để trống chỉ hợp lệ khi dev; khi `NODE_ENV=production` mà để trống thì CORS bị tắt |
+
+## Giới hạn tần suất hiện có
+
+Đăng ký 5 lần mỗi phút, đăng nhập 10, đổi mật khẩu 5, tìm kiếm tin 30, nộp hồ sơ 10, tải CV 10 (theo người dùng nếu đã đăng nhập, theo IP nếu là route công khai). Vượt hạn mức trả 429 kèm `Retry-After`.
