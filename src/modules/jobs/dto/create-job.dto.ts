@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
+  ArrayUnique,
+  IsArray,
   IsDateString,
   IsIn,
   IsInt,
@@ -7,31 +9,27 @@ import {
   IsOptional,
   IsString,
   Length,
+  Matches,
   MaxLength,
   Min,
 } from "class-validator";
 import {
   JOB_LEVELS,
-  JOB_STATUSES,
   JOB_TYPES,
   type JobLevel,
-  type JobStatus,
   type JobType,
 } from "../entities/job.entity";
+import { Type } from "class-transformer";
 
+/**
+ * Người đăng (createdBy) lấy từ token qua @CurrentUser(), status luôn là
+ * "open" khi tạo -> không nhận hai trường này từ body.
+ */
 export class CreateJobDto {
   @ApiProperty({ example: 1, description: "Id công ty đăng tin" })
   @IsInt({ message: "companyId phải là số nguyên" })
   @Min(1, { message: "companyId phải lớn hơn 0" })
   companyId: number;
-
-  @ApiProperty({
-    example: 2,
-    description: "Id người đăng tin (nhà tuyển dụng). Tạm nhận từ body",
-  })
-  @IsInt({ message: "createdBy phải là số nguyên" })
-  @Min(1, { message: "createdBy phải lớn hơn 0" })
-  createdBy: number;
 
   @ApiProperty({
     example: "Backend Intern (NestJS)",
@@ -60,6 +58,16 @@ export class CreateJobDto {
   @IsString({ message: "Địa điểm phải là chuỗi" })
   @MaxLength(150, { message: "Địa điểm tối đa 150 ký tự" })
   location?: string;
+
+  @ApiPropertyOptional({
+    example: "Hà Nội",
+    description: "Tỉnh thành làm việc",
+    maxLength: 80,
+  })
+  @IsOptional()
+  @IsString({ message: "Tỉnh/thành phải là chuỗi" })
+  @MaxLength(80, { message: "Tỉnh thành tối đa 80 ký tự" })
+  province?: string;
 
   @ApiPropertyOptional({
     enum: JOB_TYPES,
@@ -110,21 +118,29 @@ export class CreateJobDto {
   currency?: string;
 
   @ApiPropertyOptional({
-    enum: JOB_STATUSES,
-    default: "open",
-    description: "Trạng thái tin",
+    example: [1, 2, 3],
+    description: "Danh sách ID kỹ năng của tin tuyển dụng",
+    type: [Number],
   })
   @IsOptional()
-  @IsIn(JOB_STATUSES, {
-    message: `status phải là một trong: ${JOB_STATUSES.join(", ")}`,
-  })
-  status?: JobStatus;
+  @IsArray()
+  @ArrayUnique()
+  @Type(() => Number)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  skillIds?: number[];
 
   @ApiPropertyOptional({
     example: "2026-12-31",
     description: "Hạn nộp hồ sơ, định dạng YYYY-MM-DD",
   })
   @IsOptional()
-  @IsDateString({}, { message: "Hạn nộp phải đúng định dạng YYYY-MM-DD" })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "Hạn nộp phải đúng định dạng YYYY-MM-DD",
+  })
+  @IsDateString(
+    { strict: true },
+    { message: "Hạn nộp phải là ngày hợp lệ, định dạng YYYY-MM-DD" },
+  )
   deadline?: string;
 }

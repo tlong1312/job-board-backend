@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS companies (
   description TEXT,
   website     VARCHAR(255),
   address     VARCHAR(255),
+  province    VARCHAR(80),
+  ward        VARCHAR(80),
   logo_path   VARCHAR(255),
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
@@ -73,6 +75,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   title       VARCHAR(150) NOT NULL,
   description TEXT,
   location    VARCHAR(150),
+  province    VARCHAR(80),
   job_type    VARCHAR(20)  NOT NULL DEFAULT 'full_time'
               CHECK (job_type IN ('full_time', 'part_time', 'internship', 'contract')),
   level       VARCHAR(20)
@@ -96,8 +99,9 @@ CREATE TABLE IF NOT EXISTS jobs (
 );
 -- Tim kiem full-text (Tang 3)
 CREATE INDEX IF NOT EXISTS idx_jobs_search      ON jobs USING GIN (search_vector);
--- Cursor pagination: loc theo status, sap xep moi nhat truoc
+-- Loc theo status, sap xep moi nhat truoc (phan trang theo page/limit)
 CREATE INDEX IF NOT EXISTS idx_jobs_status_created ON jobs (status, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_province    ON jobs (LOWER(province));
 CREATE INDEX IF NOT EXISTS idx_jobs_company     ON jobs(company_id);
 CREATE INDEX IF NOT EXISTS idx_jobs_created_by  ON jobs(created_by);
 

@@ -1,7 +1,13 @@
+import { Company } from "src/modules/companies/entities/company.entity";
+import { Skill } from "src/modules/skills/entities/skill.entity";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -36,6 +42,10 @@ export class Job {
   @Column({ name: "company_id" })
   companyId: number;
 
+  @ManyToOne(() => Company)
+  @JoinColumn({ name: "company_id" })
+  company: Company;
+
   @Column({ name: "created_by" })
   createdBy: number;
 
@@ -47,6 +57,9 @@ export class Job {
 
   @Column({ type: "varchar", length: 150, nullable: true })
   location: string | null;
+
+  @Column({ type: "varchar", length: 80, nullable: true })
+  province: string | null;
 
   @Column({
     name: "job_type",
@@ -70,6 +83,20 @@ export class Job {
 
   @Column({ type: "varchar", length: 20, default: "open" })
   status: JobStatus;
+
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: "job_skills",
+    joinColumn: {
+      name: "job_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "skill_id",
+      referencedColumnName: "id",
+    },
+  })
+  skills: Skill[];
 
   /**
    * Cột DATE (không có giờ). TypeORM + pg trả về chuỗi "YYYY-MM-DD",

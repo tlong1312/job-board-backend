@@ -8,6 +8,7 @@ import { User } from "../users/entities/user.entity";
 import { ForBiddenException, UnAuthorizedException } from "commons/error";
 import * as crypto from "crypto";
 import { RegisterDto } from "./dto/register.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { Role } from "commons/decorators/roles.decorator";
 
 const ACCESS_TTL = "15m";
@@ -72,6 +73,19 @@ export class AuthService {
       throw new ForBiddenException("Tài khoản đã bị khóa");
     }
     return { accessToken: await this.signAccessToken(user) };
+  }
+
+  async changePassword(userId: number, dto: ChangePasswordDto) {
+    await this.userService.changePassword(
+      userId,
+      dto.currentPassword,
+      dto.newPassword,
+    );
+    await this.refreshRepository.update(
+      { userId, revokedAt: IsNull() },
+      { revokedAt: new Date() },
+    );
+    return { message: "Đổi mật khẩu thành công, vui lòng đăng nhập lại" };
   }
 
   async logout(refreshToken: string) {
