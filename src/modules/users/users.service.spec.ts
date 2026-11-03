@@ -8,8 +8,8 @@ import {
 
 // Không cần bcrypt thật (chậm, native): giả lập băm và so sánh
 jest.mock("bcrypt", () => ({
-  hash: async (plain: string) => `hashed:${plain}`,
-  compare: async (plain: string, hash: string) => hash === `hashed:${plain}`,
+  hash: (plain: string) => `hashed:${plain}`,
+  compare: (plain: string, hash: string) => hash === `hashed:${plain}`,
 }));
 
 describe("UsersService", () => {
@@ -36,7 +36,7 @@ describe("UsersService", () => {
     qb.addSelect.mockReturnValue(qb);
     qb.where.mockReturnValue(qb);
     repository.createQueryBuilder.mockReturnValue(qb);
-    repository.save.mockImplementation(async (u) => u);
+    repository.save.mockImplementation((u) => u);
     service = new UsersService(repository as never);
   });
 
@@ -49,7 +49,7 @@ describe("UsersService", () => {
         email: "  A@Example.COM ",
         password: "Matkhau123",
         fullName: "An",
-      } as never);
+      });
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { email: "a@example.com" },
@@ -69,7 +69,7 @@ describe("UsersService", () => {
     it("ném 409 khi email đã tồn tại", async () => {
       repository.findOne.mockResolvedValue({ id: 1 });
       await expect(
-        service.create({ email: "a@b.com", password: "x", fullName: "An" } as never),
+        service.create({ email: "a@b.com", password: "x", fullName: "An" }),
       ).rejects.toBeInstanceOf(ConflictException);
       expect(repository.save).not.toHaveBeenCalled();
     });

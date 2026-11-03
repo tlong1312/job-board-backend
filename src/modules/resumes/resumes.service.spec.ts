@@ -40,13 +40,13 @@ describe("ResumesService", () => {
     );
     resumes.findOne.mockResolvedValue(resume);
     applications.find.mockResolvedValue([]);
-    dataSource.transaction.mockImplementation(async (cb) => cb(manager));
+    dataSource.transaction.mockImplementation((cb) => cb(manager));
   });
 
   describe("create", () => {
     it("chỉ ứng viên mới được tải CV", async () => {
       users.findOne.mockResolvedValue({ id: 2, role: "employer" });
-      await expect(service.create({ userId: 2 } as never)).rejects.toBeInstanceOf(
+      await expect(service.create({ userId: 2 })).rejects.toBeInstanceOf(
         BadRequestException,
       );
     });
@@ -55,7 +55,7 @@ describe("ResumesService", () => {
       users.findOne.mockResolvedValue({ id: 30, role: "candidate" });
       resumes.create.mockReturnValue(resume);
       resumes.save.mockResolvedValue(resume);
-      await expect(service.create({ userId: 30 } as never)).resolves.toBe(resume);
+      await expect(service.create({ userId: 30 })).resolves.toBe(resume);
       expect(dataSource.transaction).not.toHaveBeenCalled();
     });
 
@@ -63,7 +63,7 @@ describe("ResumesService", () => {
       users.findOne.mockResolvedValue({ id: 30, role: "candidate" });
       manager.create.mockReturnValue(resume);
       manager.save.mockResolvedValue(resume);
-      await service.create({ userId: 30, isDefault: true } as never);
+      await service.create({ userId: 30, isDefault: true });
       expect(manager.update).toHaveBeenCalledWith(Resume, { userId: 30 }, { isDefault: false });
       expect(manager.save).toHaveBeenCalledWith(resume);
     });

@@ -24,7 +24,7 @@ describe("SkillsService", () => {
   describe("create", () => {
     it("ném 400 khi kỹ năng đã tồn tại", async () => {
       repository.findOne.mockResolvedValue({ id: 1, name: "NestJS" });
-      await expect(service.create({ name: "NestJS" } as never)).rejects.toBeInstanceOf(
+      await expect(service.create({ name: "NestJS" })).rejects.toBeInstanceOf(
         BadRequestException,
       );
       expect(repository.save).not.toHaveBeenCalled();
@@ -33,8 +33,8 @@ describe("SkillsService", () => {
     it("cắt khoảng trắng thừa rồi lưu", async () => {
       repository.findOne.mockResolvedValue(null);
       repository.create.mockImplementation((x) => x);
-      repository.save.mockImplementation(async (x) => ({ id: 1, ...x }));
-      const result = await service.create({ name: "  NestJS  " } as never);
+      repository.save.mockImplementation((x) => ({ id: 1, ...x }));
+      const result = await service.create({ name: "  NestJS  " });
       expect(repository.findOne).toHaveBeenCalledWith({ where: { name: "NestJS" } });
       expect(result).toEqual({ id: 1, name: "NestJS" });
     });

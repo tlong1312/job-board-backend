@@ -48,7 +48,7 @@ describe("JobsService (cache Redis và lọc tin hết hạn)", () => {
     qb.getManyAndCount.mockResolvedValue([[job], 1]);
     jobsRepository.createQueryBuilder.mockReturnValue(qb);
     jobsRepository.findOne.mockResolvedValue({ ...job });
-    jobsRepository.save.mockImplementation(async (x) => x);
+    jobsRepository.save.mockImplementation((x) => x);
     jobsRepository.create.mockImplementation((x) => x);
     jobsRepository.merge.mockImplementation((target, src) => Object.assign(target, src));
     applicationsRepository.count.mockResolvedValue(0);
@@ -68,16 +68,16 @@ describe("JobsService (cache Redis và lọc tin hết hạn)", () => {
 
   describe("danh sách tin", () => {
     it("khách và ứng viên đi qua cache", async () => {
-      await service.findAll({ page: 1 } as never, undefined);
-      await service.findAll({ page: 1 } as never, candidate);
+      await service.findAll({ page: 1 }, undefined);
+      await service.findAll({ page: 1 }, candidate);
       expect(redis.remember).toHaveBeenCalledTimes(2);
       expect(redis.remember.mock.calls[0][0]).toContain("jobs:list:");
       expect(redis.remember.mock.calls[0][1]).toBe(60);
     });
 
     it("hai truy vấn khác nhau dùng hai khoá cache khác nhau", async () => {
-      await service.findAll({ page: 1 } as never);
-      await service.findAll({ page: 2 } as never);
+      await service.findAll({ page: 1 });
+      await service.findAll({ page: 2 });
       expect(redis.remember.mock.calls[0][0]).not.toBe(redis.remember.mock.calls[1][0]);
     });
 
@@ -88,20 +88,20 @@ describe("JobsService (cache Redis và lọc tin hết hạn)", () => {
     });
 
     it("employer và admin không dùng cache (thấy cả tin đóng/khoá)", async () => {
-      await service.findAll({ page: 1 } as never, employer);
-      await service.findAll({ page: 1 } as never, admin);
+      await service.findAll({ page: 1 }, employer);
+      await service.findAll({ page: 1 }, admin);
       expect(redis.remember).not.toHaveBeenCalled();
     });
 
     it("khách/ứng viên bị loại các tin đã quá hạn nộp", async () => {
-      await service.findAll({ page: 1 } as never, undefined);
+      await service.findAll({ page: 1 }, undefined);
       expect(conditions().some((c) => c.includes("deadline") && c.includes("CURRENT_DATE"))).toBe(
         true,
       );
     });
 
     it("employer/admin vẫn thấy tin quá hạn để quản lý", async () => {
-      await service.findAll({ page: 1 } as never, employer);
+      await service.findAll({ page: 1 }, employer);
       expect(conditions().some((c) => c.includes("deadline"))).toBe(false);
     });
 
@@ -112,7 +112,7 @@ describe("JobsService (cache Redis và lọc tin hết hạn)", () => {
         companies as never,
         skills as never,
       );
-      const result = await plain.findAll({ page: 1 } as never);
+      const result = await plain.findAll({ page: 1 });
       expect(result.items).toEqual([job]);
     });
   });
@@ -132,14 +132,14 @@ describe("JobsService (cache Redis và lọc tin hết hạn)", () => {
   describe("xoá cache khi dữ liệu đổi", () => {
     it("tạo tin", async () => {
       await service.create(
-        { companyId: 1, title: "Dev" } as never,
+        { companyId: 1, title: "Dev" },
         employer,
       );
       expect(redis.invalidatePublicCache).toHaveBeenCalledTimes(1);
     });
 
     it("sửa tin", async () => {
-      await service.update(5, { title: "Mới" } as never, employer);
+      await service.update(5, { title: "Mới" }, employer);
       expect(redis.invalidatePublicCache).toHaveBeenCalledTimes(1);
     });
 
@@ -154,7 +154,7 @@ describe("JobsService (cache Redis và lọc tin hết hạn)", () => {
     });
 
     it("thao tác bị từ chối thì không xoá cache", async () => {
-      await expect(service.update(5, { title: "X" } as never, { id: 99, role: "employer" })).rejects.toBeDefined();
+      await expect(service.update(5, { title: "X" }, { id: 99, role: "employer" })).rejects.toBeDefined();
       expect(redis.invalidatePublicCache).not.toHaveBeenCalled();
     });
   });

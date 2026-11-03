@@ -28,8 +28,8 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
   beforeEach(() => {
     jest.resetAllMocks();
     applications.create.mockImplementation((x) => x);
-    applications.save.mockImplementation(async (x) => ({ id: 100, ...x }));
-    dataSource.transaction.mockImplementation(async (cb) => cb(manager));
+    applications.save.mockImplementation((x) => ({ id: 100, ...x }));
+    dataSource.transaction.mockImplementation((cb) => cb(manager));
     service = new ApplicationsService(
       applications as never,
       history as never,
@@ -65,7 +65,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
       jobs.findOne.mockResolvedValue(openJob);
       resumes.findOne.mockResolvedValue(null);
       await expect(
-        service.create({ jobId: 20, resumeId: 5 } as never, 30),
+        service.create({ jobId: 20, resumeId: 5 }, 30),
       ).rejects.toBeInstanceOf(ForBiddenException);
       expect(resumes.findOne).toHaveBeenCalledWith({ where: { id: 5, userId: 30 } });
       expect(applications.save).not.toHaveBeenCalled();
@@ -76,7 +76,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
       applications.findOne.mockResolvedValue(null);
       resumes.findOne.mockResolvedValue({ id: 5, userId: 30 });
       const saved = await service.create(
-        { jobId: 20, resumeId: 5, coverLetter: "Chào" } as never,
+        { jobId: 20, resumeId: 5, coverLetter: "Chào" },
         30,
       );
       expect(applications.create).toHaveBeenCalledWith({
@@ -92,7 +92,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
     it("không đính kèm CV thì không kiểm tra CV, resumeId = null", async () => {
       jobs.findOne.mockResolvedValue(openJob);
       applications.findOne.mockResolvedValue(null);
-      await service.create({ jobId: 20 } as never, 30);
+      await service.create({ jobId: 20 }, 30);
       expect(resumes.findOne).not.toHaveBeenCalled();
       expect(applications.create).toHaveBeenCalledWith(
         expect.objectContaining({ resumeId: null, coverLetter: null }),
@@ -108,7 +108,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
       ].join("-");
       jobs.findOne.mockResolvedValue({ ...openJob, deadline: today });
       applications.findOne.mockResolvedValue(null);
-      await expect(service.create({ jobId: 20 } as never, 30)).resolves.toBeDefined();
+      await expect(service.create({ jobId: 20 }, 30)).resolves.toBeDefined();
     });
   });
 
@@ -118,7 +118,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
     beforeEach(() => {
       jobs.findOne.mockResolvedValue(openJob);
       manager.create.mockImplementation((_entity, x) => x);
-      manager.save.mockImplementation(async (entity, x) =>
+      manager.save.mockImplementation((entity, x) =>
         entity === ApplicationStatusHistory ? { ...x, id: 77 } : x,
       );
     });
@@ -126,7 +126,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
     it("ném 403 khi không phải chủ tin", async () => {
       applications.findOne.mockResolvedValue(application());
       await expect(
-        service.changeStatus(10, { status: "viewed" } as never, 999),
+        service.changeStatus(10, { status: "viewed" }, 999),
       ).rejects.toBeInstanceOf(ForBiddenException);
       expect(dataSource.transaction).not.toHaveBeenCalled();
     });
@@ -134,14 +134,14 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
     it("ném 400 khi hồ sơ đã ở trạng thái đó", async () => {
       applications.findOne.mockResolvedValue(application());
       await expect(
-        service.changeStatus(10, { status: "new" } as never, 2),
+        service.changeStatus(10, { status: "new" }, 2),
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it("ném 400 khi hồ sơ đã bị từ chối", async () => {
       applications.findOne.mockResolvedValue({ ...application(), status: "rejected" });
       await expect(
-        service.changeStatus(10, { status: "viewed" } as never, 2),
+        service.changeStatus(10, { status: "viewed" }, 2),
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
@@ -149,7 +149,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
       applications.findOne.mockResolvedValue(application());
       const result = await service.changeStatus(
         10,
-        { status: "interview", note: "Thứ Hai 9h" } as never,
+        { status: "interview", note: "Thứ Hai 9h" },
         2,
       );
 
@@ -178,7 +178,7 @@ describe("ApplicationsService (ghi dữ liệu)", () => {
       applications.findOne.mockResolvedValue(application());
       dataSource.transaction.mockRejectedValue(new Error("DB lỗi"));
       await expect(
-        service.changeStatus(10, { status: "viewed" } as never, 2),
+        service.changeStatus(10, { status: "viewed" }, 2),
       ).rejects.toThrow("DB lỗi");
       expect(mailProducer.enqueueStatusChanged).not.toHaveBeenCalled();
     });

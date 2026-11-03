@@ -6,11 +6,13 @@ describe("MailProducer", () => {
   const subscribe = jest.fn();
   const client = { emit: jest.fn() };
   let producer: MailProducer;
+  let loggerError: jest.SpyInstance;
 
   beforeEach(() => {
     jest.resetAllMocks();
     client.emit.mockReturnValue({ subscribe });
-    jest.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
+    loggerError = jest.spyOn(Logger.prototype, "error");
+    loggerError.mockImplementation(() => undefined);
     producer = new MailProducer(client as never);
   });
 
@@ -31,6 +33,6 @@ describe("MailProducer", () => {
     producer.enqueueStatusChanged({ applicationId: 4, historyId: 9 });
     const handlers = subscribe.mock.calls[0][0];
     expect(() => handlers.error(new Error("mất kết nối"))).not.toThrow();
-    expect(Logger.prototype.error).toHaveBeenCalled();
+    expect(loggerError).toHaveBeenCalled();
   });
 });

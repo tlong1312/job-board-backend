@@ -24,11 +24,11 @@ describe("RedisService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     store = new Map();
-    mockClient.get.mockImplementation(async (k: string) => store.get(k) ?? null);
-    mockClient.set.mockImplementation(async (k: string, v: string) => {
+    mockClient.get.mockImplementation((k: string) => store.get(k) ?? null);
+    mockClient.set.mockImplementation((k: string, v: string) => {
       store.set(k, v);
     });
-    mockClient.incr.mockImplementation(async (k: string) => {
+    mockClient.incr.mockImplementation((k: string) => {
       const n = Number(store.get(k) ?? 0) + 1;
       store.set(k, String(n));
       return n;
@@ -134,7 +134,7 @@ describe("RedisService", () => {
 
     it("lỗi của loader được ném ra, không bị nuốt", async () => {
       await expect(
-        service.remember("jobs", 60, async () => {
+        service.remember("jobs", 60, () => {
           throw new Error("DB lỗi");
         }),
       ).rejects.toThrow("DB lỗi");

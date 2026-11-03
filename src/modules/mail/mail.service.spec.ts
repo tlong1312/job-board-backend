@@ -20,7 +20,7 @@ describe("MailService", () => {
 
   /** Giả lập DB: SELECT trả thông tin hồ sơ, INSERT trả dòng nhật ký, UPDATE trả rỗng. */
   const mockDb = (logStatus = "pending", rows: unknown[] = [infoRow]) => {
-    dataSource.query.mockImplementation(async (sql: string) => {
+    dataSource.query.mockImplementation((sql: string) => {
       if (sql.includes("SELECT u.email")) return rows;
       if (sql.includes("INSERT INTO email_logs")) return [{ id: 55, status: logStatus }];
       return [];
