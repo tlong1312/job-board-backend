@@ -22,3 +22,18 @@ CREATE TABLE IF NOT EXISTS job_embeddings (
 );
 CREATE INDEX IF NOT EXISTS idx_job_embeddings_hnsw
   ON job_embeddings USING hnsw (embedding vector_cosine_ops);
+
+-- Điểm AI cho từng hồ sơ ứng tuyển (bảng riêng: tắt AI thì bảng applications không bị ảnh hưởng).
+CREATE TABLE IF NOT EXISTS application_scores (
+  application_id INT PRIMARY KEY REFERENCES applications(id) ON DELETE CASCADE,
+  status         VARCHAR(10) NOT NULL CHECK (status IN ('scored', 'unscored')),
+  score          REAL,
+  label          VARCHAR(12) CHECK (label IN ('suitable', 'review', 'unsuitable')),
+  cosine         REAL,
+  skill_ratio    REAL,
+  level_gap      INT,
+  matched_skills JSONB,
+  missing_skills JSONB,
+  reason         TEXT,            -- vì sao chưa chấm được (CV không đọc được, chưa có CV...)
+  scored_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

@@ -11,6 +11,7 @@ import { LocalStrategy } from "commons/guards/local.strategy";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "commons/guards/jwt-auth.guard";
 import { RolesGuard } from "commons/guards/roles.guard";
+import { RedisModule } from "../redis/redis.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RolesGuard } from "commons/guards/roles.guard";
     UsersModule,
     PassportModule,
     JwtModule.register({}),
+    RedisModule,
   ],
   controllers: [AuthController],
   providers: [

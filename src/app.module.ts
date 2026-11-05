@@ -11,6 +11,9 @@ import { dbOptions, load } from "./config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CompaniesModule } from "./modules/companies/companies.module";
 import { AiModule } from "./modules/ai/ai.module";
+import { RedisModule } from "./modules/redis/redis.module";
+import { MailModule } from "./modules/mail/mail.module";
+import { SkillsModule } from "./modules/skills/skills.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,12 +29,15 @@ import { AiModule } from "./modules/ai/ai.module";
       inject: [ConfigService],
     }),
 
+    RedisModule,
+    MailModule,
     UsersModule,
     AuthModule,
     JobsModule,
     ApplicationsModule,
     ResumesModule,
     CompaniesModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

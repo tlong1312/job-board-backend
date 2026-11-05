@@ -5,5 +5,13 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@nestjs|uuid)/)"
+  ],
+  "moduleNameMapper": {
+    "^commons/(.*)$": "<rootDir>/../src/commons/$1",
+    "^src/(.*)$": "<rootDir>/../src/$1",
+    "^(\\.{1,2}/)+(.*/)?typeorm-compat(\\.js)?$": "typeorm"
   }
 }

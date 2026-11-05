@@ -12,8 +12,11 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { RegisterDto } from "./dto/register.dto";
 import { LocalAuthGuard } from "commons/guards/local-auth.guard";
 import { LoginDto } from "./dto/login.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
+import { CurrentUser } from "commons/decorators/current-user.decorator";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
 import { Public } from "commons/decorators/public.decorator";
+import { RateLimit, RateLimitGuard } from "../redis/rate-limit.guard";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -22,6 +25,8 @@ export class AuthController {
 
   @Post("register")
   @Public()
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 5, windowSeconds: 60 })
   @ApiOperation({ summary: "Đăng ký tài khoản" })
   @ApiResponse({
     status: 201,
@@ -36,7 +41,8 @@ export class AuthController {
   @Post("login")
   @Public()
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(RateLimitGuard, LocalAuthGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60 })
   @ApiBody({ type: LoginDto })
   @ApiOperation({ summary: "Đăng nhập bằng email và mật khẩu" })
   @ApiResponse({
@@ -59,6 +65,20 @@ export class AuthController {
   })
   refresh(@Body() dto: RefreshTokenDto) {
     return this.authService.refresh(dto.refreshToken);
+  }
+
+  @Post("change-password")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 5, windowSeconds: 60 })
+  @ApiOperation({ summary: "Đổi mật khẩu (cần đăng nhập)" })
+  @ApiResponse({ status: 200, description: "Đổi mật khẩu thành công" })
+  @ApiResponse({ status: 400, description: "Sai mật khẩu hiện tại / mật khẩu mới không hợp lệ" })
+  changePassword(
+    @CurrentUser("id") userId: number,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(userId, dto);
   }
 
   @Post("logout")

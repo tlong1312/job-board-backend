@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete, Query, UseGuards } from '@nestjs/common';
+import { RateLimit, RateLimitGuard } from '../redis/rate-limit.guard';
 import { ApplicationsService } from "./applications.service";
 import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationStatusDto } from "./dto/update-application-status.dto";
@@ -32,6 +33,8 @@ export class ApplicationsController {
 
   @Post()
   @Roles("candidate")
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60 })
   @ApiOperation({
     summary: "Ứng viên nộp hồ sơ vào tin tuyển dụng",
   })
@@ -65,7 +68,7 @@ export class ApplicationsController {
   }
 
   @Get()
-  @Roles("candidate", "employer")
+  @Roles("candidate", "employer", "admin")
   @ApiOperation({
     summary: "Lấy danh sách hồ sơ ứng tuyển",
   })
@@ -73,8 +76,9 @@ export class ApplicationsController {
     name: "jobId",
     required: false,
     type: Number,
+    example: 1,
     description:
-      "Employer truyền jobId để xem hồ sơ của tin tuyển dụng",
+      "Employer phải truyền jobId thuộc công ty của mình; admin có thể bỏ qua để xem tất cả",
   })
   @ApiOkResponse({
     description: "Mảng hồ sơ ứng tuyển",
@@ -84,7 +88,7 @@ export class ApplicationsController {
   })
   @ApiForbiddenResponse({
     description:
-      "Tin tuyển dụng không thuộc nhà tuyển dụng",
+      "Tin tuyển dụng không thuộc công ty của nhà tuyển dụng",
   })
   findAll(
     @CurrentUser() currentUser: JwtUser,
@@ -102,9 +106,9 @@ export class ApplicationsController {
   }
 
   @Get(":id")
-  @Roles("candidate")
+  @Roles("candidate", "employer", "admin")
   @ApiOperation({
-    summary: "Ứng viên xem chi tiết hồ sơ của mình",
+    summary: "Xem chi tiết hồ sơ theo quyền của người đăng nhập",
   })
   @ApiParam({
     name: "id",
@@ -116,25 +120,22 @@ export class ApplicationsController {
   })
   @ApiBadRequestResponse({
     description:
-      "jobId không phải số hoặc nhà tuyển dụng không cung cấp jobId",
+      "id không phải số",
   })
   @ApiUnauthorizedResponse({
     description: "Chưa đăng nhập",
   })
   @ApiForbiddenResponse({
-    description: "Hồ sơ không thuộc ứng viên",
+    description: "Hồ sơ không thuộc ứng viên hoặc công ty của nhà tuyển dụng",
   })
   @ApiNotFoundResponse({
     description: "Không tìm thấy hồ sơ",
   })
   findOne(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser("id") candidateId: number,
+    @CurrentUser() currentUser: JwtUser,
   ) {
-    return this.applicationsService.findOneForCandidate(
-      id,
-      candidateId,
-    );
+    return this.applicationsService.findOneForViewer(id, currentUser);
   }
 
   @Patch(":id/status")
@@ -177,13 +178,14 @@ export class ApplicationsController {
   }
 
   @Get(":id/history")
-  @Roles("candidate", "employer")
+  @Roles("candidate", "employer", "admin")
   @ApiOperation({
     summary: "Xem lịch sử thay đổi trạng thái hồ sơ",
   })
   @ApiParam({
     name: "id",
     type: Number,
+    example: 1,
     description: "Id hồ sơ ứng tuyển",
   })
   @ApiOkResponse({
@@ -194,7 +196,7 @@ export class ApplicationsController {
   })
   @ApiForbiddenResponse({
     description:
-      "Không phải ứng viên chủ hồ sơ hoặc nhà tuyển dụng chủ tin",
+      "Không phải chủ hồ sơ hoặc chủ công ty nhận hồ sơ; admin được xem tất cả",
   })
   @ApiNotFoundResponse({
     description: "Không tìm thấy hồ sơ",

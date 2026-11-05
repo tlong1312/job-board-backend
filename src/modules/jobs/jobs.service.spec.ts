@@ -4,6 +4,7 @@ import { JobsService } from "./jobs.service";
 import { Job } from "./entities/job.entity";
 import { ApplicationEntity } from "../applications/entities/application.entity";
 import { CompaniesService } from "../companies/companies.service";
+import { SkillsService } from "../skills/skills.service";
 import {
   BadRequestException,
   ForBiddenException,
@@ -16,6 +17,7 @@ describe("JobsService", () => {
   const jobsRepository = {
     findOne: jest.fn(),
     find: jest.fn(),
+    createQueryBuilder: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
     merge: jest.fn(),
@@ -23,6 +25,7 @@ describe("JobsService", () => {
   };
   const applicationsRepository = { count: jest.fn() };
   const companiesService = { findOne: jest.fn() };
+  const skillsService = { findByIds: jest.fn() };
 
   const employer: JwtUser = { id: 2, role: "employer" };
   const otherEmployer: JwtUser = { id: 3, role: "employer" };
@@ -52,10 +55,12 @@ describe("JobsService", () => {
           useValue: applicationsRepository,
         },
         { provide: CompaniesService, useValue: companiesService },
+        { provide: SkillsService, useValue: skillsService },
       ],
     }).compile();
 
     service = module.get<JobsService>(JobsService);
+    skillsService.findByIds.mockResolvedValue([]);
   });
 
   describe("findOne", () => {
@@ -70,7 +75,10 @@ describe("JobsService", () => {
       const job = { id: 1, title: "Backend Intern", status: "open" } as Job;
       jobsRepository.findOne.mockResolvedValue(job);
       await expect(service.findOne(1)).resolves.toBe(job);
-      expect(jobsRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(jobsRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+        relations: { company: true, skills: true },
+      });
     });
   });
 
@@ -105,38 +113,90 @@ describe("JobsService", () => {
   });
 
   describe("findAll", () => {
-    it("admin: sắp xếp mới nhất trước và không lọc khi không có status", async () => {
-      jobsRepository.find.mockResolvedValue([]);
+    const qb = {
+      leftJoinAndSelect: jest.fn(),
+      where: jest.fn(),
+      andWhere: jest.fn(),
+      orderBy: jest.fn(),
+      addOrderBy: jest.fn(),
+      skip: jest.fn(),
+      take: jest.fn(),
+      getManyAndCount: jest.fn(),
+    };
+    const conditions = () => qb.andWhere.mock.calls.map((c) => String(c[0]));
+
+    beforeEach(() => {
+      for (const m of [
+        qb.leftJoinAndSelect,
+        qb.where,
+        qb.andWhere,
+        qb.orderBy,
+        qb.addOrderBy,
+        qb.skip,
+        qb.take,
+      ]) {
+        m.mockReturnValue(qb);
+      }
+      qb.getManyAndCount.mockResolvedValue([[], 0]);
+      jobsRepository.createQueryBuilder.mockReturnValue(qb);
+    });
+
+    it("admin: mới nhất trước, không lọc status và không lọc hạn nộp", async () => {
       await service.findAll({}, admin);
-      expect(jobsRepository.find).toHaveBeenCalledWith({
-        where: {},
-        order: { createdAt: "DESC", id: "DESC" },
-      });
+      expect(qb.orderBy).toHaveBeenCalledWith("job.created_at", "DESC");
+      expect(conditions()).toEqual([]);
     });
 
     it("employer lọc theo status khi có", async () => {
-      jobsRepository.find.mockResolvedValue([]);
       await service.findAll({ status: "closed" }, employer);
-      expect(jobsRepository.find).toHaveBeenCalledWith({
-        where: { status: "closed" },
-        order: { createdAt: "DESC", id: "DESC" },
+      expect(qb.andWhere).toHaveBeenCalledWith("job.status = :status", {
+        status: "closed",
       });
     });
 
-    it("khách chỉ thấy tin open", async () => {
-      jobsRepository.find.mockResolvedValue([]);
+    it("khách chỉ thấy tin open và còn hạn nộp", async () => {
       await service.findAll({});
-      expect(jobsRepository.find).toHaveBeenCalledWith({
-        where: { status: "open" },
-        order: { createdAt: "DESC", id: "DESC" },
+      expect(qb.andWhere).toHaveBeenCalledWith("job.status = :status", {
+        status: "open",
       });
+      expect(conditions().some((c) => c.includes("deadline"))).toBe(true);
     });
 
-    it("ứng viên xin status khác open -> mảng rỗng, không truy vấn", async () => {
-      await expect(
-        service.findAll({ status: "blocked" }, candidate),
-      ).resolves.toEqual([]);
-      expect(jobsRepository.find).not.toHaveBeenCalled();
+    it("ứng viên xin status khác open -> danh sách rỗng, không truy vấn", async () => {
+      const result = await service.findAll({ status: "blocked" }, candidate);
+      expect(result.items).toEqual([]);
+      expect(jobsRepository.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    it("lọc theo tỉnh, cấp bậc và tên công ty", async () => {
+      await service.findAll(
+        { province: "HCM", level: "junior", companyName: "acme" },
+        admin,
+      );
+      const all = conditions().join(" | ");
+      expect(all).toContain("job.province");
+      expect(all).toContain("job.level");
+      expect(all).toContain("company.name");
+    });
+
+    it("trả kèm thông tin phân trang", async () => {
+      qb.getManyAndCount.mockResolvedValue([[{ id: 1 }], 25]);
+      const result = await service.findAll({ page: 2, limit: 10 }, admin);
+      expect(result.items).toEqual([{ id: 1 }]);
+      expect(result.meta).toEqual(
+        expect.objectContaining({ page: 2, limit: 10, total: 25 }),
+      );
+    });
+  });
+
+  describe("findMyJobs", () => {
+    it("chỉ lấy tin do người này tạo, mới nhất trước", async () => {
+      jobsRepository.find.mockResolvedValue([]);
+      await service.findMyJobs(2);
+      expect(jobsRepository.find).toHaveBeenCalledWith({
+        where: { createdBy: 2 },
+        order: { id: "DESC" },
+      });
     });
   });
 
@@ -203,6 +263,7 @@ describe("JobsService", () => {
         ...full,
         createdBy: 2,
         status: "open",
+        skills: [],
       });
       expect(jobsRepository.save).toHaveBeenCalledWith(entity);
     });

@@ -44,10 +44,6 @@ export class JobsController {
     private readonly authService: AuthService,
   ) {}
 
-  /**
-   * API @Public() không đi qua bước gắn user của JwtAuthGuard, nên tự đọc token ở đây.
-   * Không có token / token sai / hết hạn: coi là khách (undefined), không ném lỗi.
-   */
   private async getViewer(
     authorization?: string,
   ): Promise<JwtUser | undefined> {
@@ -92,6 +88,14 @@ export class JobsController {
   async findAll(@Query() query: QueryJobDto, @Req() req: Request) {
     const viewer = await this.getViewer(req.headers.authorization);
     return this.jobsService.findAll(query, viewer);
+  }
+
+  @Get('mine')
+  @Roles('employer')
+  @ApiOperation({ summary: 'Lấy danh sách tin tuyển dụng do nhà tuyển dụng hiện tại đăng' })
+  findMyJobs(@CurrentUser() currentUser: any) {
+    const userId = +(currentUser.id || currentUser.userId || currentUser.sub);
+    return this.jobsService.findMyJobs(userId);
   }
 
   @Get(":id")

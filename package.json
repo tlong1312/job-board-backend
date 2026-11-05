@@ -22,7 +22,9 @@
     "ai:eval": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-search.ts",
     "ai:match": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-cv-job.ts",
     "ai:process-resumes": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/process-resumes.ts",
-    "ai:score-applications": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/score-applications.ts"
+    "ai:score-applications": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/score-applications.ts",
+    "db:migrate": "node scripts/db.js migrate",
+    "db:seed": "node scripts/db.js seed"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -41,6 +43,7 @@
     "class-validator": "^0.15.1",
     "ioredis": "^5.11.1",
     "mammoth": "^1.13.0",
+    "nodemailer": "^10.2.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pdf-parse": "^1.1.1",
@@ -61,6 +64,7 @@
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.3.0",
     "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.2",
     "@types/passport-local": "^1.0.38",
     "@types/pdf-parse": "^1.1.5",
     "@types/supertest": "^7.0.0",
