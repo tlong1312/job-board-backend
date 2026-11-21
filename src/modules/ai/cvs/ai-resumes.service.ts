@@ -1,8 +1,10 @@
 import { basename, join } from "path";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger, Optional } from "@nestjs/common";
 import { DataSource } from "typeorm";
 import { CvReadError, readCvText } from "./cv-text-reader";
 import { CvInfo, extractCvInfo } from "./cv-extractor";
+import { cvExtractorMode, extractCvInfoWithLlm } from "./cv-llm-extractor";
+import { LLM_PROVIDER, LlmProvider } from "../providers/llm.provider";
 import {
   DEFAULT_THRESHOLDS,
   DEFAULT_WEIGHTS,
@@ -64,6 +66,7 @@ export class AiResumesService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly ai: AiService,
+    @Optional() @Inject(LLM_PROVIDER) private readonly llm?: LlmProvider,
   ) {}
 
   private async loadResume(id: number): Promise<ResumeRow> {
@@ -83,12 +86,27 @@ export class AiResumesService {
     }
   }
 
+  /** Rút thông tin CV theo CV_EXTRACTOR; LLM lỗi thì quay về từ điển để hệ thống vẫn chạy. */
+  private async extractInfo(text: string): Promise<CvInfo> {
+    if (cvExtractorMode() === "llm" && this.llm) {
+      try {
+        return await extractCvInfoWithLlm(this.llm, text);
+      } catch (e) {
+        this.logger.warn(
+          `LLM rút CV lỗi, dùng từ điển thay thế: ${e instanceof Error ? e.message : String(e)}`,
+        );
+        return { ...extractCvInfo(text), extractor: "rules-fallback" };
+      }
+    }
+    return { ...extractCvInfo(text), extractor: "rules" };
+  }
+
   async processResume(id: number): Promise<ParsedResume> {
     const r = await this.loadResume(id);
     try {
       const filePath = join(process.cwd(), "uploads", basename(r.file_name));
       const text = await readCvText(filePath, r.mime_type);
-      const info = extractCvInfo(text);
+      const info = await this.extractInfo(text);
       const vector = await this.ai.embed(text.slice(0, MAX_EMBED_CHARS));
       await this.dataSource.query(
         `UPDATE resumes
@@ -97,7 +115,7 @@ export class AiResumesService {
         [id, text, JSON.stringify(info), AiService.toVectorLiteral(vector)],
       );
       this.logger.log(
-        `CV ${id}: ${info.skills.length} kỹ năng, ${info.years ?? "?"} năm, cấp ${info.level ?? "?"}`,
+        `CV ${id}: ${info.skills.length} kỹ năng, ${info.years ?? "?"} năm, cấp ${info.level ?? "?"} [${info.extractor}]`,
       );
       return { resumeId: id, info, textLength: text.length };
     } catch (e) {

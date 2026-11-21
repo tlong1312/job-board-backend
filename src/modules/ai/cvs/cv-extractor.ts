@@ -11,6 +11,8 @@ export interface CvInfo {
   level: CvLevel | null;
   province: string | null;
   desiredTitle: string | null;
+  /** Cách đã dùng để rút: "rules" (từ điển), "llm", hoặc "rules-fallback" (LLM lỗi nên quay về từ điển). */
+  extractor?: "rules" | "llm" | "rules-fallback";
 }
 
 interface Term {

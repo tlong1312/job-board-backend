@@ -1,0 +1,843 @@
+diff --git a/.env.example b/.env.example
+index 3704bcf..f893dd1 100644
+--- a/.env.example
++++ b/.env.example
+@@ -32,3 +32,13 @@ MAIL_FROM=Job Board <no-reply@jobboard.local>
+ # Sinh nhanh:  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ JWT_ACCESS_SECRET=chuoi-ngau-nhien-dai-it-nhat-32-ky-tu
+ JWT_REFRESH_SECRET=chuoi-ngau-nhien-khac-voi-access-secret
++
++# AI (chỉ dùng khi AI_ENABLED=true; cần Ollama đang chạy)
++# AI_ENABLED=false
++# OLLAMA_URL=http://localhost:11434
++# EMBEDDING_MODEL=bge-m3
++# Cách rút thông tin CV: rules (từ điển, mặc định) hoặc llm (cần `ollama pull qwen2.5:3b`; LLM lỗi thì tự quay về rules)
++# CV_EXTRACTOR=rules
++# LLM_MODEL=qwen2.5:3b
++# LLM_TIMEOUT_MS=120000
++# LLM_NUM_CTX=4096
+diff --git a/package.json b/package.json
+index 843959a..372f26c 100644
+--- a/package.json
++++ b/package.json
+@@ -21,6 +21,7 @@
+     "ai:embed-jobs": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/embed-all-jobs.ts",
+     "ai:eval": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-search.ts",
+     "ai:match": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-cv-job.ts",
++    "ai:eval-cv": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-cv-extraction.ts",
+     "ai:process-resumes": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/process-resumes.ts",
+     "ai:score-applications": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/score-applications.ts",
+     "db:migrate": "node scripts/db.js migrate",
+diff --git a/src/modules/ai/ai.module.ts b/src/modules/ai/ai.module.ts
+index ceabedd..15a2ec4 100644
+--- a/src/modules/ai/ai.module.ts
++++ b/src/modules/ai/ai.module.ts
+@@ -16,6 +16,8 @@ import { AiJobsProducer } from "./jobs/ai-jobs.producer";
+ import { AiJobsService } from "./jobs/ai-jobs.service";
+ import { EMBEDDING_PROVIDER } from "./providers/embedding.provider";
+ import { OllamaEmbeddingProvider } from "./providers/ollama-embedding.provider";
++import { LLM_PROVIDER } from "./providers/llm.provider";
++import { OllamaLlmProvider } from "./providers/ollama-llm.provider";
+ import { AiResumesController } from "./cvs/ai-resumes.controller";
+ import { AiResumesConsumer } from "./cvs/ai-resumes.consumer";
+ import { AiResumesService } from "./cvs/ai-resumes.service";
+@@ -58,6 +60,7 @@ export class AiModule {
+       ],
+       providers: [
+         { provide: EMBEDDING_PROVIDER, useClass: OllamaEmbeddingProvider },
++        { provide: LLM_PROVIDER, useClass: OllamaLlmProvider },
+         AiService,
+         AiJobsService,
+         AiJobsProducer,
+diff --git a/src/modules/ai/cvs/ai-resumes.service.ts b/src/modules/ai/cvs/ai-resumes.service.ts
+index 80af9d6..b77a683 100644
+--- a/src/modules/ai/cvs/ai-resumes.service.ts
++++ b/src/modules/ai/cvs/ai-resumes.service.ts
+@@ -1,8 +1,10 @@
+ import { basename, join } from "path";
+-import { Injectable, Logger } from "@nestjs/common";
++import { Inject, Injectable, Logger, Optional } from "@nestjs/common";
+ import { DataSource } from "typeorm";
+ import { CvReadError, readCvText } from "./cv-text-reader";
+ import { CvInfo, extractCvInfo } from "./cv-extractor";
++import { cvExtractorMode, extractCvInfoWithLlm } from "./cv-llm-extractor";
++import { LLM_PROVIDER, LlmProvider } from "../providers/llm.provider";
+ import {
+   DEFAULT_THRESHOLDS,
+   DEFAULT_WEIGHTS,
+@@ -64,6 +66,7 @@ export class AiResumesService {
+   constructor(
+     private readonly dataSource: DataSource,
+     private readonly ai: AiService,
++    @Optional() @Inject(LLM_PROVIDER) private readonly llm?: LlmProvider,
+   ) {}
+ 
+   private async loadResume(id: number): Promise<ResumeRow> {
+@@ -83,12 +86,27 @@ export class AiResumesService {
+     }
+   }
+ 
++  /** Rút thông tin CV theo CV_EXTRACTOR; LLM lỗi thì quay về từ điển để hệ thống vẫn chạy. */
++  private async extractInfo(text: string): Promise<CvInfo> {
++    if (cvExtractorMode() === "llm" && this.llm) {
++      try {
++        return await extractCvInfoWithLlm(this.llm, text);
++      } catch (e) {
++        this.logger.warn(
++          `LLM rút CV lỗi, dùng từ điển thay thế: ${e instanceof Error ? e.message : String(e)}`,
++        );
++        return { ...extractCvInfo(text), extractor: "rules-fallback" };
++      }
++    }
++    return { ...extractCvInfo(text), extractor: "rules" };
++  }
++
+   async processResume(id: number): Promise<ParsedResume> {
+     const r = await this.loadResume(id);
+     try {
+       const filePath = join(process.cwd(), "uploads", basename(r.file_name));
+       const text = await readCvText(filePath, r.mime_type);
+-      const info = extractCvInfo(text);
++      const info = await this.extractInfo(text);
+       const vector = await this.ai.embed(text.slice(0, MAX_EMBED_CHARS));
+       await this.dataSource.query(
+         `UPDATE resumes
+@@ -97,7 +115,7 @@ export class AiResumesService {
+         [id, text, JSON.stringify(info), AiService.toVectorLiteral(vector)],
+       );
+       this.logger.log(
+-        `CV ${id}: ${info.skills.length} kỹ năng, ${info.years ?? "?"} năm, cấp ${info.level ?? "?"}`,
++        `CV ${id}: ${info.skills.length} kỹ năng, ${info.years ?? "?"} năm, cấp ${info.level ?? "?"} [${info.extractor}]`,
+       );
+       return { resumeId: id, info, textLength: text.length };
+     } catch (e) {
+diff --git a/src/modules/ai/cvs/cv-extractor.ts b/src/modules/ai/cvs/cv-extractor.ts
+index 201ea04..36c04a9 100644
+--- a/src/modules/ai/cvs/cv-extractor.ts
++++ b/src/modules/ai/cvs/cv-extractor.ts
+@@ -11,6 +11,8 @@ export interface CvInfo {
+   level: CvLevel | null;
+   province: string | null;
+   desiredTitle: string | null;
++  /** Cách đã dùng để rút: "rules" (từ điển), "llm", hoặc "rules-fallback" (LLM lỗi nên quay về từ điển). */
++  extractor?: "rules" | "llm" | "rules-fallback";
+ }
+ 
+ interface Term {
+diff --git a/src/modules/ai/cvs/cv-llm-extractor.spec.ts b/src/modules/ai/cvs/cv-llm-extractor.spec.ts
+new file mode 100644
+index 0000000..3036ea4
+--- /dev/null
++++ b/src/modules/ai/cvs/cv-llm-extractor.spec.ts
+@@ -0,0 +1,131 @@
++import {
++  LlmExtractError,
++  buildCvPrompt,
++  cvExtractorMode,
++  extractCvInfoWithLlm,
++  normalizeProvince,
++  parseLlmCv,
++} from "./cv-llm-extractor";
++import { LlmProvider } from "../providers/llm.provider";
++
++const CV =
++  "Ứng viên A | Địa điểm: Hà Nội | Kỹ năng | NestJS, TypeScript, Node.js, PostgreSQL, Docker | " +
++  "Kinh nghiệm làm việc | 2023 - 2025 (2 năm), công ty X: phát triển API bằng NestJS và Docker.";
++
++const fakeLlm = (reply: string): LlmProvider => ({
++  model: "fake",
++  completeJson: () => Promise.resolve(reply),
++});
++
++describe("parseLlmCv", () => {
++  it("đọc JSON hợp lệ và đưa kỹ năng về tên chuẩn trong từ điển", () => {
++    const info = parseLlmCv(
++      JSON.stringify({
++        skills: ["Nest.js", "TS", "Docker"],
++        years: 2,
++        province: "Ha Noi",
++        desiredTitle: "Backend Developer",
++      }),
++      CV,
++    );
++    expect(info).not.toBeNull();
++    expect(info!.skills).toEqual(["Docker", "NestJS", "TypeScript"]);
++    expect(info!.years).toBe(2);
++    expect(info!.level).toBe("middle");
++    expect(info!.province).toBe("Hà Nội");
++    expect(info!.desiredTitle).toBe("Backend Developer");
++    expect(info!.extractor).toBe("llm");
++  });
++
++  it("bỏ kỹ năng LLM bịa: không có trong từ điển hoặc không xuất hiện trong CV", () => {
++    const info = parseLlmCv(
++      JSON.stringify({
++        skills: ["Docker", "Kubernetes", "CobolMaster"],
++        years: 1,
++      }),
++      CV,
++    );
++    // Kubernetes có trong từ điển nhưng CV không nhắc tới; CobolMaster không có trong từ điển
++    expect(info!.skills).toEqual(["Docker"]);
++  });
++
++  it("chấp nhận JSON bị bọc trong ```json hoặc kèm vài chữ", () => {
++    const raw =
++      'Đây là kết quả:\n```json\n{"skills": ["Docker"], "years": 2}\n```';
++    expect(parseLlmCv(raw, CV)!.skills).toEqual(["Docker"]);
++  });
++
++  it("trả null khi không phải JSON hoặc thiếu trường skills", () => {
++    expect(parseLlmCv("xin lỗi, tôi không biết", CV)).toBeNull();
++    expect(parseLlmCv('["Docker"]', CV)).toBeNull();
++    expect(parseLlmCv('{"years": 2}', CV)).toBeNull();
++  });
++
++  it("số năm không hợp lệ thì coi như không rút được", () => {
++    expect(parseLlmCv('{"skills": [], "years": -3}', CV)!.years).toBeNull();
++    expect(parseLlmCv('{"skills": [], "years": 99}', CV)!.years).toBeNull();
++    expect(parseLlmCv('{"skills": [], "years": "abc"}', CV)!.years).toBeNull();
++    expect(parseLlmCv('{"skills": [], "years": "2,5"}', CV)!.years).toBe(2.5);
++  });
++
++  it("cấp độ tính từ số năm bằng quy tắc cũ, không hỏi LLM", () => {
++    const level = (years: number) =>
++      parseLlmCv(JSON.stringify({ skills: [], years }), CV)!.level;
++    expect(level(0)).toBe("intern");
++    expect(level(1)).toBe("junior");
++    expect(level(3)).toBe("middle");
++    expect(level(6)).toBe("senior");
++  });
++});
++
++describe("normalizeProvince", () => {
++  it("đưa các cách viết về một dạng chuẩn", () => {
++    expect(normalizeProvince("TP.HCM")).toBe("TP. Hồ Chí Minh");
++    expect(normalizeProvince("Hanoi")).toBe("Hà Nội");
++    expect(normalizeProvince("Hai Phong")).toBe("Hải Phòng");
++    expect(normalizeProvince("  ")).toBeNull();
++    expect(normalizeProvince("Huế")).toBe("Huế");
++  });
++});
++
++describe("extractCvInfoWithLlm", () => {
++  it("trả CvInfo khi LLM trả JSON dùng được", async () => {
++    const info = await extractCvInfoWithLlm(
++      fakeLlm('{"skills":["NestJS"],"years":2}'),
++      CV,
++    );
++    expect(info.skills).toEqual(["NestJS"]);
++  });
++
++  it("ném LlmExtractError khi LLM trả rác (để nơi gọi quay về từ điển)", async () => {
++    await expect(
++      extractCvInfoWithLlm(fakeLlm("không phải json"), CV),
++    ).rejects.toBeInstanceOf(LlmExtractError);
++  });
++});
++
++describe("buildCvPrompt", () => {
++  it("liệt kê kỹ năng chuẩn trong từ điển và cắt CV quá dài", () => {
++    const { system, user } = buildCvPrompt("x".repeat(20000));
++    expect(system).toContain("NestJS");
++    expect(system).toContain("Docker");
++    expect(user.length).toBeLessThan(5100);
++  });
++});
++
++describe("cvExtractorMode", () => {
++  const old = process.env.CV_EXTRACTOR;
++  afterEach(() => {
++    if (old === undefined) delete process.env.CV_EXTRACTOR;
++    else process.env.CV_EXTRACTOR = old;
++  });
++
++  it("mặc định là rules, chỉ bật llm khi đặt đúng", () => {
++    delete process.env.CV_EXTRACTOR;
++    expect(cvExtractorMode()).toBe("rules");
++    process.env.CV_EXTRACTOR = "LLM";
++    expect(cvExtractorMode()).toBe("llm");
++    process.env.CV_EXTRACTOR = "gi-do-khac";
++    expect(cvExtractorMode()).toBe("rules");
++  });
++});
+diff --git a/src/modules/ai/cvs/cv-llm-extractor.ts b/src/modules/ai/cvs/cv-llm-extractor.ts
+new file mode 100644
+index 0000000..facef76
+--- /dev/null
++++ b/src/modules/ai/cvs/cv-llm-extractor.ts
+@@ -0,0 +1,144 @@
++/**
++ * Rút thông tin từ CV bằng LLM (chạy qua Ollama), để so sánh với cách từ điển + quy tắc
++ * trong cv-extractor.ts.
++ *
++ * LLM chỉ đảm nhận phần "đọc hiểu": kỹ năng, số năm kinh nghiệm, tỉnh/thành, vị trí ứng tuyển.
++ * Kết quả luôn được kiểm lại bằng code thường để mô hình có "bịa" cũng không lọt vào hệ thống:
++ *  - kỹ năng phải đổi được về tên chuẩn trong từ điển VÀ có xuất hiện trong văn bản CV;
++ *  - số năm phải là số hợp lệ (0 đến 50), nếu không thì coi như không rút được;
++ *  - cấp độ KHÔNG hỏi LLM mà tính từ số năm bằng đúng quy tắc cũ (levelFromYears),
++ *    để hai cách rút chỉ khác nhau ở phần đọc hiểu.
++ *
++ * Phần xử lý kết quả (parseLlmCv) là hàm thuần, không gọi mạng nên thử được bằng jest.
++ */
++import { CvInfo, findSkills, levelFromYears } from "./cv-extractor";
++import { SKILL_DICTIONARY } from "./cv-skills.dictionary";
++import { LlmProvider } from "../providers/llm.provider";
++
++/** Chỉ gửi phần đầu CV cho LLM (CV thường ngắn hơn nhiều; giữ trong giới hạn ngữ cảnh). */
++export const MAX_LLM_CV_CHARS = 5000;
++
++export class LlmExtractError extends Error {}
++
++export type CvExtractorMode = "rules" | "llm";
++
++/** Chọn cách rút CV bằng biến môi trường CV_EXTRACTOR=rules|llm (mặc định rules). */
++export function cvExtractorMode(): CvExtractorMode {
++  return (process.env.CV_EXTRACTOR ?? "rules").trim().toLowerCase() === "llm"
++    ? "llm"
++    : "rules";
++}
++
++const SKILL_NAMES = SKILL_DICTIONARY.map((s) => s.name);
++
++export function buildCvPrompt(cvText: string): {
++  system: string;
++  user: string;
++} {
++  const system = [
++    "You extract structured data from a resume written in Vietnamese or English.",
++    "Reply with ONE JSON object and nothing else, in exactly this shape:",
++    '{"skills": string[], "years": number | null, "province": string | null, "desiredTitle": string | null}',
++    "",
++    "Rules:",
++    `- "skills": technical skills the candidate lists or clearly uses. Choose ONLY from this list and spell each exactly as written: ${SKILL_NAMES.join(", ")}.`,
++    '- "years": total years of professional work experience. Add up the job entries. Do NOT count years spent at school. Use 0 if the resume says the candidate has no experience. Use null if it cannot be told.',
++    '- "province": the city or province where the candidate lives or wants to work, for example "Hà Nội" or "TP. Hồ Chí Minh". Use null if not stated.',
++    '- "desiredTitle": the position the candidate is applying for. Use null if not stated.',
++    "- Never invent anything that is not in the resume.",
++  ].join("\n");
++  const user = `Resume:\n"""\n${cvText.slice(0, MAX_LLM_CV_CHARS)}\n"""`;
++  return { system, user };
++}
++
++const PROVINCES: Array<[RegExp, string]> = [
++  [
++    /(?:ho chi minh|hồ chí minh|\bhcm\b|tp\.?\s*hcm|sài gòn|sai gon)/i,
++    "TP. Hồ Chí Minh",
++  ],
++  [/(?:ha noi|hà nội|hanoi)/i, "Hà Nội"],
++  [/(?:hai phong|hải phòng)/i, "Hải Phòng"],
++  [/(?:da nang|đà nẵng)/i, "Đà Nẵng"],
++  [/(?:can tho|cần thơ)/i, "Cần Thơ"],
++];
++
++/** Đưa cách viết tỉnh/thành về một dạng chuẩn; không nhận ra thì giữ nguyên chuỗi đã cắt gọn. */
++export function normalizeProvince(raw: string): string | null {
++  const s = raw.trim();
++  if (!s) return null;
++  for (const [re, name] of PROVINCES) if (re.test(s)) return name;
++  return s.slice(0, 80);
++}
++
++function toYears(v: unknown): number | null {
++  const n = typeof v === "string" ? Number(v.replace(",", ".")) : v;
++  if (typeof n !== "number" || !Number.isFinite(n) || n < 0 || n > 50)
++    return null;
++  return Math.round(n * 10) / 10;
++}
++
++function parseJsonObject(raw: string): Record<string, unknown> | null {
++  const tryParse = (s: string): Record<string, unknown> | null => {
++    try {
++      const v: unknown = JSON.parse(s);
++      return v !== null && typeof v === "object" && !Array.isArray(v)
++        ? (v as Record<string, unknown>)
++        : null;
++    } catch {
++      return null;
++    }
++  };
++  const direct = tryParse(raw.trim());
++  if (direct) return direct;
++  // Có mô hình bọc JSON trong ```json ... ``` hoặc thêm vài chữ: lấy đoạn từ { đầu tới } cuối
++  const start = raw.indexOf("{");
++  const end = raw.lastIndexOf("}");
++  return start !== -1 && end > start
++    ? tryParse(raw.slice(start, end + 1))
++    : null;
++}
++
++/** Biến câu trả lời thô của LLM thành CvInfo đã kiểm tra; trả null nếu không dùng được. */
++export function parseLlmCv(raw: string, cvText: string): CvInfo | null {
++  const obj = parseJsonObject(raw);
++  if (!obj || !("skills" in obj)) return null;
++
++  const mentioned = findSkills(cvText);
++  const claimed = Array.isArray(obj.skills)
++    ? obj.skills.filter((s): s is string => typeof s === "string")
++    : [];
++  const skills = [...new Set(claimed.flatMap((s) => findSkills(s)))]
++    .filter((s) => mentioned.includes(s))
++    .sort((a, b) => a.localeCompare(b));
++
++  const years = toYears(obj.years);
++  const province =
++    typeof obj.province === "string" ? normalizeProvince(obj.province) : null;
++  const title =
++    typeof obj.desiredTitle === "string" ? obj.desiredTitle.trim() : "";
++
++  return {
++    skills,
++    mentionedSkills: mentioned,
++    years,
++    level: levelFromYears(years, cvText),
++    province,
++    desiredTitle: title ? title.slice(0, 120) : null,
++    extractor: "llm",
++  };
++}
++
++export async function extractCvInfoWithLlm(
++  llm: LlmProvider,
++  cvText: string,
++): Promise<CvInfo> {
++  const { system, user } = buildCvPrompt(cvText);
++  const raw = await llm.completeJson(system, user);
++  const info = parseLlmCv(raw, cvText);
++  if (!info) {
++    throw new LlmExtractError(
++      `LLM trả về JSON không dùng được: ${raw.slice(0, 120)}`,
++    );
++  }
++  return info;
++}
+diff --git a/src/modules/ai/providers/llm.provider.ts b/src/modules/ai/providers/llm.provider.ts
+new file mode 100644
+index 0000000..47c0d91
+--- /dev/null
++++ b/src/modules/ai/providers/llm.provider.ts
+@@ -0,0 +1,12 @@
++/**
++ * Cổng chung để gọi một mô hình ngôn ngữ lớn (LLM). Hiện có một cài đặt là Ollama
++ * (ollama-llm.provider.ts). Tách cổng ra để sau này đổi mô hình hoặc nhà cung cấp
++ * mà không phải sửa nơi dùng, giống cách làm với EMBEDDING_PROVIDER.
++ */
++export const LLM_PROVIDER = "LLM_PROVIDER";
++
++export interface LlmProvider {
++  readonly model: string;
++  /** Gửi một cặp system/user, nhận về chuỗi JSON do mô hình sinh ra. */
++  completeJson(system: string, user: string): Promise<string>;
++}
+diff --git a/src/modules/ai/providers/ollama-llm.provider.ts b/src/modules/ai/providers/ollama-llm.provider.ts
+new file mode 100644
+index 0000000..7fb175b
+--- /dev/null
++++ b/src/modules/ai/providers/ollama-llm.provider.ts
+@@ -0,0 +1,68 @@
++import { Injectable, ServiceUnavailableException } from "@nestjs/common";
++import { ConfigService } from "@nestjs/config";
++import { LlmProvider } from "./llm.provider";
++
++/**
++ * Gọi LLM chạy trong Ollama qua /api/chat. Cấu hình bằng biến môi trường:
++ *   OLLAMA_URL         (mặc định http://localhost:11434, dùng chung với embedding)
++ *   LLM_MODEL          (mặc định qwen2.5:3b, phải đã `ollama pull` trước)
++ *   LLM_TIMEOUT_MS     (mặc định 120000)
++ *   LLM_NUM_CTX        (mặc định 4096, số token ngữ cảnh)
++ */
++@Injectable()
++export class OllamaLlmProvider implements LlmProvider {
++  readonly model: string;
++  private readonly baseUrl: string;
++  private readonly timeoutMs: number;
++  private readonly numCtx: number;
++
++  constructor(config: ConfigService) {
++    this.baseUrl = config
++      .get<string>("OLLAMA_URL", "http://localhost:11434")
++      .replace(/\/+$/, "");
++    this.model = config.get<string>("LLM_MODEL", "qwen2.5:3b");
++    this.timeoutMs = Number(config.get("LLM_TIMEOUT_MS", 120000));
++    this.numCtx = Number(config.get("LLM_NUM_CTX", 4096));
++  }
++
++  async completeJson(system: string, user: string): Promise<string> {
++    let res: Response;
++    try {
++      res = await fetch(`${this.baseUrl}/api/chat`, {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({
++          model: this.model,
++          stream: false,
++          format: "json",
++          messages: [
++            { role: "system", content: system },
++            { role: "user", content: user },
++          ],
++          // nhiệt độ 0 để cùng một CV luôn ra cùng một kết quả (dễ đo, dễ lặp lại)
++          options: { temperature: 0, num_ctx: this.numCtx },
++        }),
++        signal: AbortSignal.timeout(this.timeoutMs),
++      });
++    } catch (e) {
++      const msg = e instanceof Error ? e.message : String(e);
++      throw new ServiceUnavailableException(
++        `Không gọi được Ollama tại ${this.baseUrl}: ${msg}`,
++      );
++    }
++
++    if (!res.ok) {
++      const body = await res.text().catch(() => "");
++      throw new ServiceUnavailableException(
++        `Ollama trả lỗi ${res.status} (model ${this.model}): ${body.slice(0, 200)}`,
++      );
++    }
++
++    const data = (await res.json()) as { message?: { content?: unknown } };
++    const content = data.message?.content;
++    if (typeof content !== "string" || content.trim() === "") {
++      throw new ServiceUnavailableException("Ollama trả về nội dung rỗng");
++    }
++    return content;
++  }
++}
+diff --git a/src/modules/ai/scripts/eval-cv-extraction.ts b/src/modules/ai/scripts/eval-cv-extraction.ts
+index e263fe4..611b0fc 100644
+--- a/src/modules/ai/scripts/eval-cv-extraction.ts
++++ b/src/modules/ai/scripts/eval-cv-extraction.ts
+@@ -1,6 +1,19 @@
++/**
++ * Đo chất lượng rút thông tin CV so với đáp án ẩn trong resumes.json.
++ *
++ *   npm run ai:eval-cv                          (cách từ điển, như trước đây)
++ *   npm run ai:eval-cv -- --extractor llm       (LLM qua Ollama)
++ *   npm run ai:eval-cv -- --extractor both      (chạy cả hai rồi in bảng so sánh)
++ *
++ * Tùy chọn: --file <đường dẫn resumes.json>
++ * LLM cấu hình bằng biến môi trường (xem .env.example): OLLAMA_URL, LLM_MODEL...
++ * Chạy ở chế độ llm/both thì Ollama phải đang chạy và đã `ollama pull` model.
++ */
+ import * as fs from "fs";
+ import * as path from "path";
+-import { extractCvInfo } from "../cvs/cv-extractor";
++import { CvInfo, extractCvInfo } from "../cvs/cv-extractor";
++import { extractCvInfoWithLlm } from "../cvs/cv-llm-extractor";
++import { OllamaLlmProvider } from "../providers/ollama-llm.provider";
+ 
+ interface Sample {
+   ref: string;
+@@ -12,7 +25,26 @@ interface Sample {
+   province: string;
+ }
+ 
+-const file = process.argv[2] ?? "seed-data/data/resumes.json";
++type Mode = "rules" | "llm" | "both";
++type Kind = "skills" | "mentionedSkills";
++
++const argv = process.argv.slice(2);
++const flag = (name: string): string | undefined => {
++  const i = argv.indexOf(`--${name}`);
++  return i === -1 ? undefined : argv[i + 1];
++};
++const positional = argv.find(
++  (a, i) =>
++    !a.startsWith("--") &&
++    argv[i - 1] !== "--extractor" &&
++    argv[i - 1] !== "--file",
++);
++const file = flag("file") ?? positional ?? "seed-data/data/resumes.json";
++const mode = (flag("extractor") ?? "rules") as Mode;
++if (!["rules", "llm", "both"].includes(mode)) {
++  console.error("--extractor phải là rules, llm hoặc both");
++  process.exit(1);
++}
+ const samples: Sample[] = JSON.parse(fs.readFileSync(file, "utf-8"));
+ 
+ const pct = (a: number, b: number) =>
+@@ -43,80 +75,222 @@ const prf = (c: Counts) => {
+ };
+ const f = (n: number) => `${(n * 100).toFixed(1)}%`;
+ 
+-const lines: string[] = [];
+-const out = (s = "") => {
+-  lines.push(s);
+-  console.log(s);
++const EMPTY: CvInfo = {
++  skills: [],
++  mentionedSkills: [],
++  years: null,
++  level: null,
++  province: null,
++  desiredTitle: null,
+ };
+ 
+-const formats = ["all", ...new Set(samples.map((s) => s.format))];
+-const detail: string[] = [];
++interface Run {
++  label: string;
++  infos: Map<string, CvInfo>;
++  msPerCv: number;
++  failed: number;
++}
+ 
+-out("## Rút kỹ năng (so với đáp án ẩn)\n");
+-out(
+-  "| Nhóm | Số CV | Cách | Precision | Recall | F1 | CV rút đúng hoàn toàn |",
+-);
+-out("|---|---|---|---|---|---|---|");
+-for (const fmt of formats) {
+-  const group = samples.filter((s) => fmt === "all" || s.format === fmt);
+-  for (const kind of ["skills", "mentionedSkills"] as const) {
+-    const c: Counts = { tp: 0, fp: 0, fn: 0 };
+-    let exact = 0;
+-    for (const s of group) {
+-      const info = extractCvInfo(s.text);
+-      add(c, s.skills, info[kind]);
+-      if (sameSet(s.skills, info[kind])) exact++;
++async function runExtractor(
++  label: string,
++  extract: (text: string) => Promise<CvInfo>,
++): Promise<Run> {
++  const infos = new Map<string, CvInfo>();
++  let failed = 0;
++  let total = 0;
++  for (const s of samples) {
++    const t0 = process.hrtime.bigint();
++    try {
++      infos.set(s.ref, await extract(s.text));
++    } catch (e) {
++      failed++;
++      infos.set(s.ref, EMPTY); // lỗi tính như không rút được gì (tính theo hướng bất lợi)
++      console.error(
++        `[${label}] ${s.ref} lỗi: ${e instanceof Error ? e.message : String(e)}`,
++      );
++    }
++    total += Number(process.hrtime.bigint() - t0) / 1e6;
++  }
++  return { label, infos, msPerCv: total / samples.length, failed };
++}
++
++interface Summary {
++  label: string;
++  precision: number;
++  recall: number;
++  f1: number;
++  exact: number;
++  years: number;
++  level: number;
++  province: number;
++  msPerCv: number;
++  failed: number;
++}
++
++function report(
++  run: Run,
++  kinds: Kind[],
++  outFile: string,
++): { summary: Summary; lines: string[] } {
++  const lines: string[] = [];
++  const out = (s = "") => {
++    lines.push(s);
++    console.log(s);
++  };
++  const formats = ["all", ...new Set(samples.map((s) => s.format))];
++  const detail: string[] = [];
++
++  out("## Rút kỹ năng (so với đáp án ẩn)\n");
++  out(
++    "| Nhóm | Số CV | Cách | Precision | Recall | F1 | CV rút đúng hoàn toàn |",
++  );
++  out("|---|---|---|---|---|---|---|");
++  let summary: Pick<Summary, "precision" | "recall" | "f1" | "exact"> = {
++    precision: 0,
++    recall: 0,
++    f1: 0,
++    exact: 0,
++  };
++  for (const fmt of formats) {
++    const group = samples.filter((s) => fmt === "all" || s.format === fmt);
++    for (const kind of kinds) {
++      const c: Counts = { tp: 0, fp: 0, fn: 0 };
++      let exact = 0;
++      for (const s of group) {
++        const info = run.infos.get(s.ref)!;
++        add(c, s.skills, info[kind]);
++        if (sameSet(s.skills, info[kind])) exact++;
++      }
++      const r = prf(c);
++      if (fmt === "all" && kind === "skills")
++        summary = { ...r, exact: exact / group.length };
++      out(
++        `| ${fmt} | ${group.length} | ${kind === "skills" ? "mục Kỹ năng" : "cả CV"} | ${f(r.precision)} | ${f(r.recall)} | ${f(r.f1)} | ${exact}/${group.length} |`,
++      );
+     }
+-    const r = prf(c);
++  }
++
++  let yearsOk = 0,
++    levelOk = 0,
++    provOk = 0;
++  for (const s of samples) {
++    const info = run.infos.get(s.ref)!;
++    if (info.years === s.years) yearsOk++;
++    else
++      detail.push(`${s.ref}: số năm đáp án ${s.years}, rút được ${info.years}`);
++    if (info.level === s.level) levelOk++;
++    else
++      detail.push(`${s.ref}: cấp độ đáp án ${s.level}, rút được ${info.level}`);
++    if (info.province === s.province) provOk++;
++    else
++      detail.push(
++        `${s.ref}: tỉnh đáp án ${s.province}, rút được ${info.province}`,
++      );
++    const miss = s.skills.filter((x) => !info.skills.includes(x));
++    const extra = info.skills.filter((x) => !s.skills.includes(x));
++    if (miss.length || extra.length) {
++      detail.push(
++        `${s.ref} [${s.format}]: thiếu [${miss.join(", ")}], thừa [${extra.join(", ")}]`,
++      );
++    }
++  }
++
++  out("\n## Các trường khác\n");
++  out("| Trường | Đúng | Tỉ lệ |");
++  out("|---|---|---|");
++  out(
++    `| Số năm kinh nghiệm | ${yearsOk}/${samples.length} | ${pct(yearsOk, samples.length)} |`,
++  );
++  out(
++    `| Cấp độ | ${levelOk}/${samples.length} | ${pct(levelOk, samples.length)} |`,
++  );
++  out(
++    `| Tỉnh/thành | ${provOk}/${samples.length} | ${pct(provOk, samples.length)} |`,
++  );
++
++  if (run.label !== "rules") {
+     out(
+-      `| ${fmt} | ${group.length} | ${kind === "skills" ? "mục Kỹ năng" : "cả CV"} | ${f(r.precision)} | ${f(r.recall)} | ${f(r.f1)} | ${exact}/${group.length} |`,
++      `\nThời gian trung bình: ${run.msPerCv.toFixed(0)} ms mỗi CV. CV bị lỗi (tính như không rút được gì): ${run.failed}/${samples.length}.`,
+     );
+   }
++
++  out("\n## Các chỗ sai\n");
++  out(
++    detail.length === 0 ? "Không có." : detail.map((d) => `- ${d}`).join("\n"),
++  );
++
++  const dir = "seed-data/results";
++  if (fs.existsSync("seed-data")) {
++    fs.mkdirSync(dir, { recursive: true });
++    fs.writeFileSync(path.join(dir, outFile), lines.join("\n"));
++  }
++  return {
++    summary: {
++      label: run.label,
++      ...summary,
++      years: yearsOk / samples.length,
++      level: levelOk / samples.length,
++      province: provOk / samples.length,
++      msPerCv: run.msPerCv,
++      failed: run.failed,
++    },
++    lines,
++  };
+ }
+ 
+-let yearsOk = 0,
+-  levelOk = 0,
+-  provOk = 0;
+-for (const s of samples) {
+-  const info = extractCvInfo(s.text);
+-  if (info.years === s.years) yearsOk++;
+-  else
+-    detail.push(`${s.ref}: số năm đáp án ${s.years}, rút được ${info.years}`);
+-  if (info.level === s.level) levelOk++;
+-  else
+-    detail.push(`${s.ref}: cấp độ đáp án ${s.level}, rút được ${info.level}`);
+-  if (info.province === s.province) provOk++;
+-  else
+-    detail.push(
+-      `${s.ref}: tỉnh đáp án ${s.province}, rút được ${info.province}`,
++async function main() {
++  const summaries: Summary[] = [];
++
++  if (mode === "rules" || mode === "both") {
++    const run = await runExtractor("rules", (t) =>
++      Promise.resolve(extractCvInfo(t)),
+     );
+-  const miss = s.skills.filter((x) => !info.skills.includes(x));
+-  const extra = info.skills.filter((x) => !s.skills.includes(x));
+-  if (miss.length || extra.length) {
+-    detail.push(
+-      `${s.ref} [${s.format}]: thiếu [${miss.join(", ")}], thừa [${extra.join(", ")}]`,
++    summaries.push(
++      report(run, ["skills", "mentionedSkills"], "cv-extraction.md").summary,
+     );
+   }
+-}
+ 
+-out("\n## Các trường khác\n");
+-out("| Trường | Đúng | Tỉ lệ |");
+-out("|---|---|---|");
+-out(
+-  `| Số năm kinh nghiệm | ${yearsOk}/${samples.length} | ${pct(yearsOk, samples.length)} |`,
+-);
+-out(
+-  `| Cấp độ | ${levelOk}/${samples.length} | ${pct(levelOk, samples.length)} |`,
+-);
+-out(
+-  `| Tỉnh/thành | ${provOk}/${samples.length} | ${pct(provOk, samples.length)} |`,
+-);
+-
+-out("\n## Các chỗ sai\n");
+-out(detail.length === 0 ? "Không có." : detail.map((d) => `- ${d}`).join("\n"));
++  if (mode === "llm" || mode === "both") {
++    try {
++      // eslint-disable-next-line @typescript-eslint/no-require-imports
++      require("dotenv").config();
++    } catch {
++      /* không có dotenv thì dùng biến môi trường có sẵn */
++    }
++    const env = (k: string, d?: unknown) => process.env[k] ?? d;
++    const llm = new OllamaLlmProvider({ get: env } as never);
++    console.log(`\n=== LLM: ${llm.model} ===`);
++    // Gọi thử một lần cho mô hình nạp vào bộ nhớ, để thời gian đo không tính lần nạp
++    try {
++      await extractCvInfoWithLlm(llm, "warm up");
++    } catch {
++      /* chỉ cần mô hình nạp xong, kết quả bỏ qua */
++    }
++    const run = await runExtractor("llm", (t) => extractCvInfoWithLlm(llm, t));
++    summaries.push(report(run, ["skills"], "cv-extraction-llm.md").summary);
++  }
+ 
+-const dir = "seed-data/results";
+-if (fs.existsSync("seed-data")) {
+-  fs.mkdirSync(dir, { recursive: true });
+-  fs.writeFileSync(path.join(dir, "cv-extraction.md"), lines.join("\n"));
++  if (summaries.length === 2) {
++    const lines = [
++      "\n## So sánh từ điển và LLM (kỹ năng lấy theo mục Kỹ năng)\n",
++      "| Cách | Precision | Recall | F1 | CV rút đúng hoàn toàn | Số năm | Cấp độ | Tỉnh | ms mỗi CV | CV lỗi |",
++      "|---|---|---|---|---|---|---|---|---|---|",
++      ...summaries.map(
++        (s) =>
++          `| ${s.label} | ${f(s.precision)} | ${f(s.recall)} | ${f(s.f1)} | ${f(s.exact)} | ${f(s.years)} | ${f(s.level)} | ${f(s.province)} | ${s.msPerCv.toFixed(1)} | ${s.failed} |`,
++      ),
++    ];
++    lines.forEach((l) => console.log(l));
++    if (fs.existsSync("seed-data")) {
++      fs.writeFileSync(
++        path.join("seed-data/results", "cv-extraction-compare.md"),
++        lines.join("\n"),
++      );
++    }
++  }
+ }
++
++main().catch((e) => {
++  console.error(e);
++  process.exit(1);
++});

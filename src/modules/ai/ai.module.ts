@@ -16,6 +16,8 @@ import { AiJobsProducer } from "./jobs/ai-jobs.producer";
 import { AiJobsService } from "./jobs/ai-jobs.service";
 import { EMBEDDING_PROVIDER } from "./providers/embedding.provider";
 import { OllamaEmbeddingProvider } from "./providers/ollama-embedding.provider";
+import { LLM_PROVIDER } from "./providers/llm.provider";
+import { OllamaLlmProvider } from "./providers/ollama-llm.provider";
 import { AiResumesController } from "./cvs/ai-resumes.controller";
 import { AiResumesConsumer } from "./cvs/ai-resumes.consumer";
 import { AiResumesService } from "./cvs/ai-resumes.service";
@@ -58,6 +60,7 @@ export class AiModule {
       ],
       providers: [
         { provide: EMBEDDING_PROVIDER, useClass: OllamaEmbeddingProvider },
+        { provide: LLM_PROVIDER, useClass: OllamaLlmProvider },
         AiService,
         AiJobsService,
         AiJobsProducer,

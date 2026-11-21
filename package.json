@@ -21,6 +21,7 @@
     "ai:embed-jobs": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/embed-all-jobs.ts",
     "ai:eval": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-search.ts",
     "ai:match": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-cv-job.ts",
+    "ai:eval-cv": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/eval-cv-extraction.ts",
     "ai:process-resumes": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/process-resumes.ts",
     "ai:score-applications": "ts-node -r tsconfig-paths/register src/modules/ai/scripts/score-applications.ts",
     "db:migrate": "node scripts/db.js migrate",
