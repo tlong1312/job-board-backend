@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
 } from "class-validator";
 import { SEARCH_MODES, SearchMode } from "./ai-search.service";
@@ -15,6 +16,7 @@ export class SearchQueryDto {
   @ApiProperty({ example: "việc làm cho người mới ra trường muốn làm backend" })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(300)
   q: string;
 
   @ApiPropertyOptional({ enum: SEARCH_MODES, default: "hybrid" })

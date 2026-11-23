@@ -151,7 +151,7 @@ export class AiResumesService {
     limit = 10,
   ): Promise<{ resumeId: number; items: JobMatch[] }> {
     const rows = await this.dataSource.query(
-      `SELECT embedding::text AS v, parsed_data FROM resumes WHERE id = $1`,
+      `SELECT user_id, embedding::text AS v, parsed_data FROM resumes WHERE id = $1`,
       [resumeId],
     );
     if (rows.length === 0)
@@ -166,6 +166,7 @@ export class AiResumesService {
     }
     const info = rows[0].parsed_data as CvInfo;
     const cvVector: string = rows[0].v;
+    const ownerId = Number(rows[0].user_id);
 
     const cands: Array<{
       id: number;
@@ -181,9 +182,13 @@ export class AiResumesService {
          JOIN jobs j ON j.id = je.job_id
          LEFT JOIN companies c ON c.id = j.company_id
         WHERE j.status = 'open'
+          AND (j.deadline IS NULL OR j.deadline >= CURRENT_DATE)
+          AND NOT EXISTS (
+            SELECT 1 FROM applications a
+             WHERE a.job_id = j.id AND a.candidate_id = $2)
         ORDER BY je.embedding <=> $1::vector
         LIMIT ${CANDIDATES}`,
-      [cvVector],
+      [cvVector, ownerId],
     );
     if (cands.length === 0) return { resumeId, items: [] };
 

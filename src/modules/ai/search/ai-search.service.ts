@@ -11,6 +11,12 @@ export interface SearchHit {
   level: string | null;
   province: string | null;
   location: string | null;
+  companyName: string | null;
+  jobType: string | null;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  /** Dạng "YYYY-MM-DD" hoặc null nếu không giới hạn hạn nộp. */
+  deadline: string | null;
   score: number;
 }
 
@@ -88,7 +94,12 @@ export function fuseRrf(
     .slice(0, limit);
 }
 
-const SELECT_COLS = `j.id, j.title, j.level, j.province, j.location`;
+const SELECT_COLS = `j.id, j.title, j.level, j.province, j.location,
+  co.name AS company_name, j.job_type, j.salary_min, j.salary_max,
+  to_char(j.deadline, 'YYYY-MM-DD') AS deadline`;
+const FROM_JOBS = `jobs j LEFT JOIN companies co ON co.id = j.company_id`;
+/** Chỉ job đang mở và chưa hết hạn nộp. */
+const OPEN_JOB = `j.status = 'open' AND (j.deadline IS NULL OR j.deadline >= CURRENT_DATE)`;
 
 @Injectable()
 export class AiSearchService {
@@ -148,8 +159,8 @@ export class AiSearchService {
       .join(" + ");
     const sql = `
       SELECT ${SELECT_COLS}, (${score})::float AS score
-      FROM jobs j
-      WHERE j.status = 'open' AND (${score}) > 0
+      FROM ${FROM_JOBS}
+      WHERE ${OPEN_JOB} AND (${score}) > 0
       ORDER BY score DESC, j.id
       LIMIT $${tokens.length + 1}`;
     const rows = await this.dataSource.query(sql, [
@@ -165,8 +176,8 @@ export class AiSearchService {
     if (tokens.length === 0) return [];
     const sql = `
       SELECT ${SELECT_COLS}, ts_rank_cd(j.search_vector, q.query)::float AS score
-      FROM jobs j, (SELECT to_tsquery('simple', $1) AS query) q
-      WHERE j.status = 'open' AND j.search_vector @@ q.query
+      FROM ${FROM_JOBS}, (SELECT to_tsquery('simple', $1) AS query) q
+      WHERE ${OPEN_JOB} AND j.search_vector @@ q.query
       ORDER BY score DESC, j.id
       LIMIT $2`;
     const rows = await this.dataSource.query(sql, [tokens.join(" | "), limit]);
@@ -182,7 +193,8 @@ export class AiSearchService {
       SELECT ${SELECT_COLS}, (1 - (e.embedding <=> $1::vector))::float AS score
       FROM job_embeddings e
       JOIN jobs j ON j.id = e.job_id
-      WHERE j.status = 'open'
+      LEFT JOIN companies co ON co.id = j.company_id
+      WHERE ${OPEN_JOB}
       ORDER BY e.embedding <=> $1::vector
       LIMIT $2`;
     const rows = await this.dataSource.query(sql, [
@@ -200,6 +212,11 @@ function toHit(r: Record<string, unknown>): SearchHit {
     level: (r.level as string | null) ?? null,
     province: (r.province as string | null) ?? null,
     location: (r.location as string | null) ?? null,
+    companyName: (r.company_name as string | null) ?? null,
+    jobType: (r.job_type as string | null) ?? null,
+    salaryMin: r.salary_min == null ? null : Number(r.salary_min),
+    salaryMax: r.salary_max == null ? null : Number(r.salary_max),
+    deadline: (r.deadline as string | null) ?? null,
     score: Number(r.score),
   };
 }

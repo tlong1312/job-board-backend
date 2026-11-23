@@ -26,6 +26,7 @@ import { AiApplicationsController } from "./applications/ai-applications.control
 import { AiApplicationsConsumer } from "./applications/ai-applications.consumer";
 import { AiApplicationsProducer } from "./applications/ai-applications.producer";
 import { AiApplicationsService } from "./applications/ai-applications.service";
+import { RedisModule } from "../redis/redis.module";
 
 @Module({})
 export class AiModule {
@@ -37,6 +38,7 @@ export class AiModule {
       global: true,
       imports: [
         ConfigModule,
+        RedisModule,
         ClientsModule.registerAsync([
           {
             name: AI_QUEUE_CLIENT,
